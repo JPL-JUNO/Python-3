@@ -1,2 +1,26 @@
 \chapter{Python Tricks\label{Ch02}}
 \section{Using List Comprehension to Find Top Earners}
+
+\section{Reading a File}
+To access files on your computer, you need to know how to open and close files. You can access a file's data only after you've opened it. After closing the file, you can be sure that the data was written into the file. Python may create a buffer and wait for a while before it writes the whole buffer into the file (Figure 2-1). The reason for this is simple: file access is slow.
+
+For efficiency reasons, Python avoids writing every single bit independently. Instead, it waits until the buffer has filled with enough bytes and then flushes the whole buffer at once into the file.
+
+\figures{fig2-1}{Opening and closing a file in Python}
+That's why it's good practice to close the file after reading it with the
+command f.close(), to ensure all the data is properly written into the file
+instead of residing in temporary memory. However, in a few exceptions,
+Python closes the file automatically: one of these exceptions occurs when
+the reference count drops to zero.
+
+\section{Using Lambda and Map Functions}
+You can use lambda functions to define a simple function with a return value (the return value can be any object, including tuples, lists, and sets). In other words, every lambda function returns an object value to its calling environment. \important{Note that this poses a practical restriction to lambda functions, because unlike standard functions, they are not designed to execute code without returning an object value to the calling environment.}
+
+\tcbox{
+    \textsf{lambda arguments : return expression}
+}
+
+You start the function definition with the keyword lambda, followed by a sequence of function arguments. When calling the function, the caller must provide these arguments. You then include a colon (:) and the return expression, which calculates the return value based on the arguments of the lambda function. The return expression calculates the function output and can be any Python expression.
+
+One common example is using lambda with the map() function that takes as input arguments a function object f and a sequence s. The map() function then applies the function f on each element in the sequence s.
+\section{Using Slicing to Extract Matching Substring Environments}
