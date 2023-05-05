@@ -36,3 +36,14 @@ highlight the technique’s many interesting properties:
 \end{itemize}
 
 \section{Combining List Comprehension and Slicing}
+
+\section{Using Slice Assignment to Correct Corrupted Lists}
+Slice assignments use slicing notation on the left-hand side of an assignment operation to modify a subsequence of the original sequence.
+
+You’ll use slice assignments to select and replace a sequence of elements between indices i and j by using the slicing notation lst[i:j] = [0 0 ...0]. Because you are using slicing lst[i:j] on the left-hand side of the assignment operation (rather than on the right-hand side as done previously), the feature is denoted as slice assignments.
+
+The idea of slice assignments is simple: replace all selected elements in
+the original sequence on the left with the elements on the right.
+
+\section{Analyzing Cardiac Health Data with List Concatenation}
+You’ll combine slicing with the new Python feature list concatenation, which creates a new list by concatenating (that is, joining) existing lists.
