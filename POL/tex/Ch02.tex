@@ -24,3 +24,15 @@ You start the function definition with the keyword lambda, followed by a sequenc
 
 One common example is using lambda with the map() function that takes as input arguments a function object f and a sequence s. The map() function then applies the function f on each element in the sequence s.
 \section{Using Slicing to Extract Matching Substring Environments}
+
+\tcbox{\textsf{x[start:stop:step]}}
+These variants of the basic \textsf{[start:stop:step]} pattern of Python slicing
+highlight the technique’s many interesting properties:
+\begin{itemize}
+    \item If start $>=$ stop with a positive step size, the slice is empty.
+    \item If the stop argument is larger than the sequence length, Python will slice all the way to and including the rightmost element.
+    \item If the step size is positive, the default start is the leftmost element, and the default stop is the rightmost element (included).
+    \item If the step size is negative (step $<$ 0), the slice traverses the sequence in reverse order. With empty start and stop arguments, you slice from the rightmost element (included) to the leftmost element (included). Note that if the stop argument is given, the respective position is excluded from the slice.
+\end{itemize}
+
+\section{Combining List Comprehension and Slicing}
