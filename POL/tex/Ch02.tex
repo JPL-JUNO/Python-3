@@ -27,7 +27,7 @@ One common example is using lambda with the map() function that takes as input a
 
 \tcbox{\textsf{x[start:stop:step]}}
 These variants of the basic \textsf{[start:stop:step]} pattern of Python slicing
-highlight the technique’s many interesting properties:
+highlight the technique's many interesting properties:
 \begin{itemize}
     \item If start $>=$ stop with a positive step size, the slice is empty.
     \item If the stop argument is larger than the sequence length, Python will slice all the way to and including the rightmost element.
@@ -40,10 +40,16 @@ highlight the technique’s many interesting properties:
 \section{Using Slice Assignment to Correct Corrupted Lists}
 Slice assignments use slicing notation on the left-hand side of an assignment operation to modify a subsequence of the original sequence.
 
-You’ll use slice assignments to select and replace a sequence of elements between indices i and j by using the slicing notation lst[i:j] = [0 0 ...0]. Because you are using slicing lst[i:j] on the left-hand side of the assignment operation (rather than on the right-hand side as done previously), the feature is denoted as slice assignments.
+You'll use slice assignments to select and replace a sequence of elements between indices i and j by using the slicing notation lst[i:j] = [0 0 ...0]. Because you are using slicing lst[i:j] on the left-hand side of the assignment operation (rather than on the right-hand side as done previously), the feature is denoted as slice assignments.
 
 The idea of slice assignments is simple: replace all selected elements in
 the original sequence on the left with the elements on the right.
 
 \section{Analyzing Cardiac Health Data with List Concatenation}
-You’ll combine slicing with the new Python feature list concatenation, which creates a new list by concatenating (that is, joining) existing lists.
+You'll combine slicing with the new Python feature list concatenation, which creates a new list by concatenating (that is, joining) existing lists.
+
+\section{Using Generator Expressions to Find Companies That Pay Below Minimum Wage}
+\section{Formatting Databases with the zip() Function}
+The \textsf{zip()} function takes iterables iter\_1, iter\_2, $\dots$, iter\_n and aggregates them into a single iterable by aligning the corresponding i-th values into a single tuple. The result is an iterable of tuples.
+
+\textit{The zip() function doesn't care that one input is a list and the other is a tuple. The function requires only that the input is an iterable (and both lists and tuples are iterables).}

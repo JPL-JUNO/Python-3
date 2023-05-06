@@ -1,0 +1,11 @@
+\chapter{Data Science\label{Ch03}}
+When you apply NumPy operators to integer arrays, they try to generate integer arrays as results too. Only when dividing two integer arrays by using the division operator, a / b, will the result be a float array. This is indicated by the decimal points: 1., 0., and 0.5.
+
+The element-wise multiplication of two multidimensional arrays is called the \textit{Hadamard product}.
+
+\section{Working with NumPy Arrays: Slicing, Broadcasting, and Array Types}
+You can access elements of a one-dimensional array by using the bracket operation [] to specify the index or index range. You can also use indexing for a multidimensional array by specifying the index for each dimension independently and using comma-separated indices to access the different dimensions.
+
+If you increase the dimensionality of an array (for example, you move from 2D to 3D arrays), the new axis becomes axis 0, and the $i$-th axis of the low-dimensional array becomes the $(i + 1)$-th axis of the high-dimensional array. 就是在最左侧添加新维度。
+
+When you create the array, NumPy realizes it contains only integer values, and so assumes it to be an integer array. Any operation you perform on the integer array won't change the data type, and NumPy will round down to integer values.
