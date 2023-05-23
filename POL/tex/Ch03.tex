@@ -9,3 +9,6 @@ You can access elements of a one-dimensional array by using the bracket operatio
 If you increase the dimensionality of an array (for example, you move from 2D to 3D arrays), the new axis becomes axis 0, and the $i$-th axis of the low-dimensional array becomes the $(i + 1)$-th axis of the high-dimensional array. 就是在最左侧添加新维度。
 
 When you create the array, NumPy realizes it contains only integer values, and so assumes it to be an integer array. Any operation you perform on the integer array won't change the data type, and NumPy will round down to integer values.
+\section{Conditional Array Search, Filtering, and Broadcasting to Detect Outliers}
+
+\section{Boolean Indexing to Filter Two-Dimensional Arrays} You create two arrays: a contains two-dimensional numerical data (think of it as the data array), and indices contains Boolean values (think of it as the indexing array). A great feature of NumPy is that you can use the Boolean array for fine-grained access to the data array. In plain English, you create a new array containing only those elements of the data array a for which the indexing array indices contains True values at the respective array positions. For example, if indices[i,j]==True, the new array contains the value a[i,j]. Similarly, if indices[i,j]==False, the new array does not contain the value a[i,j].
