@@ -1,0 +1,12 @@
+\chapter{Built-In Data Types\label{Ch02}}
+\section{Mutable or immutable? That is the question}
+\textbf{Custom objects in Python are mutable (unless you code them not to be)}. Keep this concept in mind, as it's very important.
+\section{Numbers}
+\subsection{Integers}
+Python has two division operators, one performs the so-called \textbf{true division} (/), which returns the quotient of the operands, and another one, the so-called \textbf{integer division} (//), which returns the \textit{floored} quotient of the operands. Integer division in Python is \textbf{always rounded toward minus infinity}.
+\subsection{Booleans}
+Boolean algebra is that subset of algebra in which the values of the variables are the truth values, true and false. Booleans are a subclass of integers, so True and False behave respectively like 1 and 0. The equivalent of the int class for Booleans is the bool class, which returns either True or False. Every built-in Python object has a value in the Boolean context, which means they basically evaluate to either True or False when fed to the bool function.
+
+\textbf{Upcasting} is a type conversion operation that goes from a subclass to its parent.
+\subsection{Real numbers}
+Real numbers, or floating point numbers, are represented in Python according to the IEEE 754 double-precision binary floating point format, which is stored in 64 bits of information divided into three sections: sign, exponent, and mantissa.
