@@ -2,11 +2,6 @@
 
 Read notes for Python book
 
-## Contents
-
-1. 
-2. []()
-
 ## Status Table
 
 | Title                                                                                      | Notes | Status    |
