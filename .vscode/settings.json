@@ -1,5 +1,13 @@
 {
-  "cSpell.words": ["cappu", "drdre", "JQKA", "stiurf", "tshirt", "tshirts"],
+  "cSpell.words": [
+    "cappu",
+    "drdre",
+    "JQKA",
+    "leds",
+    "stiurf",
+    "tshirt",
+    "tshirts"
+  ],
   "[python]": {
     "editor.defaultFormatter": "ms-python.autopep8"
   },
