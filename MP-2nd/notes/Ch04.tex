@@ -1,0 +1,10 @@
+\chapter{Pythonic Design Patterns\label{Ch04}}
+\section{Core collections}
+\subsection{dict-A map of items}
+\begin{tcolorbox}
+    To debug hash collisions, you can use the \verb|hash()| function paired with \verb|collections.Counter|. This will quickly show you where hash collisions occur but it does not take the dict probing sequence into consideration.
+\end{tcolorbox}
+
+In addition to the hash collision performance problem, there is another behavior that might surprise you. When deleting items from a dictionary, it won’t actually resize the dictionary in memory. The result is that both copying and iterating over the entire dictionary take O(m) time (where m is the maximum size of the dictionary); n, the current number of items, is not used.
+
+\subsection{set-Like a dict without values}
