@@ -14,3 +14,11 @@ print_set('spam:', spam)
 
 eggs = set('eggs')
 print_set('eggs:', eggs)
+
+
+current_users = set(('a', 'b', 'd'))
+new_users = set(('d', 'c', 'd', 'e'))
+to_insert = new_users - current_users
+to_delete = current_users - new_users
+unchanged = current_users & new_users
+
