@@ -9,3 +9,5 @@ FP-2nd/Codes/Ch02/floats-1M.npy
 FP-2nd/Codes/Ch02/floats-1M-lines.txt
 *.pytest_cache
 *.pyc
+MP-2nd/.vscode/settings.json
+*.vscode
