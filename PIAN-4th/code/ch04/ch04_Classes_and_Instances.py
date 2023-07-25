@@ -64,8 +64,7 @@ class C5:
         print('Hello')
 
 
-# Descriptors
-print('===== Descriptors ======')
+print('### Descriptors #############################')
 
 
 class Const:  # class with an overriding descriptor, see later
@@ -100,3 +99,113 @@ assert x.c == 23
 
 assert isinstance('c', type(None) | str)
 print(type(None))
+
+an_instance = C5()
+
+
+class C6:
+    # An __init__ method must not return a value
+    # other than None; if it does, Python raises a TypeError exception.
+    #
+    # The main purpose of __init__ is to bind,
+    # and thus create, the attributes of a newly created instance.
+    def __init__(self, n):
+        self.x = n
+
+
+another_instance = C6(42)
+
+an_instance.hello()
+print(another_instance.x)
+
+
+class C7:
+    pass
+
+
+# You can give an instance object an attribute
+# by binding a value to an attribute reference.
+z = C7()
+z.x = 23
+print(z.x)
+
+# Creating an instance sets two instance attributes.
+print(z.__class__.__name__, z.__dict__)
+
+print('#### The factory function idiom ############################')
+
+
+class SpecialCase:
+    def a_method(self):
+        print('special')
+
+
+class NormalCase:
+    def a_method(self):
+        print('normal')
+
+
+def appropriate_case(is_normal=True):
+    if is_normal:
+        return NormalCase()
+    else:
+        return SpecialCase()
+
+
+an_instance = appropriate_case(is_normal=False)
+an_instance.a_method()
+
+# __new__
+
+
+# x = Const(77)
+# is equivalent to:
+x = Const.__new__(Const, 77)
+if isinstance(x, Const):
+    type(x).__init__(x, 77)
+print(x.value)
+
+
+class Singleton:
+    _singleton = {}
+
+    def __new__(cls, *args, **kwds):
+        if cls not in cls._singleton:
+            cls._singleton[cls] = obj = super().__new__(cls)
+            obj._initialized = False
+        return cls._singleton[cls]
+
+
+print('### Attribute Reference Basics #############################')
+
+
+class B:
+    a = 23
+    b = 45
+
+    def f(self):
+        print('method f in class B')
+
+    def g(self):
+        print('method g in class B')
+
+
+class C(B):
+    b = 67
+    c = 89
+    d = 123
+
+    def g(self):
+        print('method g in class C')
+
+    def h(self):
+        print('method h in class C')
+
+
+x = C()
+x.d = 77
+x.e = 88
+# print(C.__name__)  # C
+# print(C.__base__)  # <class '__main__.B'>
+# print(x.__class__)  # <class '__main__.C'>
+print(B.__dict__)
