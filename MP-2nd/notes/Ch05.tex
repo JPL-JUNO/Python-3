@@ -3,3 +3,5 @@
 无需过多深入 $\lambda$ 演算，这意味着仅使用函数参数作为输入来执行计算，并且输出由新变量组成，\textbf{而不会改变输入变量}。对于严格函数式编程语言，这种行为将被强制执行，但由于 Python 不是严格函数式语言，因此这不一定成立。
 \subsection{Purely functional}
 纯函数式编程期望函数没有副作用。这意味着赋予函数的参数不应改变，任何其他外部状态也不应改变。
+\section{lambda functions}
+\href{https://peps.python.org/pep-0008/#programming-recommendations}{Do note that PEP8 dictates that assigning a lambda to a variable is a bad idea}. And logically, it is. The idea of an anonymous function is that it is just that—anonymous and without a name. If you are giving it an identity, you should define it as a normal function.
