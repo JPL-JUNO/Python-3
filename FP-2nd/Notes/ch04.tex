@@ -10,3 +10,12 @@ ASCII is a common subset to all the encodings that I know about, therefore encod
 
 \subsection{处理UnicodeDecodeError}
 不是每一个字节都包含有效的 ASCII 字符，也不是每一个字符序列都是有效的 UTF-8 或 UTF-16。因此，把二进制序列转换成文本时，如果假设是这两个编码中的一个，遇到无法转换的字节序列时会抛出 UnicodeDecodeError。
+
+\section{Unicode 文本排序}
+Python 比较任何类型的序列时，会一一比较序列里的各个元素。对字符串来说，比较的是码位。可是在比较非 ASCII 字符时，得到的结果不尽如人意。
+
+在 Python 中，非 ASCII 文本的标准排序方式是使用 locale.strxfrm 函数，根据 locale 模块的文档，这个函数会“把字符串转换成适合所在区域进行比较的形式”。使用 locale.strxfrm 函数之前，必须先为应用设定合适的区域设置，还要祈祷操作系统支持这项设置。
+\subsection{}
+
+\section{Unicode 数据库}
+\subsection{字符的数值意义}

@@ -40,9 +40,53 @@ def shave_marks_latin(txt):
     return unicodedata.normalize('NFC', shaved)
 
 
+"""
+@Description: 把一些西文印刷字符转换成 ASCII 字符集
+@Author(s): Stephen CUI
+@LastEditor(s): Stephen CUI
+@CreatedTime: 2023-08-11 13:04:53
+"""
+
+# 构建字符到字符的替换映射
+single_map = str.maketrans("""‚ƒ„ˆ‹‘’“”•–—˜›""",
+                           """'f"^<''""---~>""")
+
+# 构建字符到字符串的替换映射表
+multi_map = str.maketrans({
+    '€': 'EUR',
+    '…': '...',
+    'Æ': 'AE',
+    'æ': 'ae',
+    'Œ': 'OE',
+    'œ': 'oe',
+    '™': '(TM)',
+    '‰': '<per mille>',
+    '†': '**',
+    '‡': '***',
+})
+
+# 合并两种映射表
+multi_map.update(single_map)
+# print(multi_map)
+
+
+def dewinize(txt):
+    """把cp1252符号替换为ASCII字符或字符序列"""
+    return txt.translate(multi_map)
+
+
+def asciize(txt):
+    """"""
+    no_marks = shave_marks_latin(dewinize(txt))  # 调用 dewinize 函数，再去掉变音符
+    no_marks = no_marks.replace('ß', 'ss')
+    return unicodedata.normalize('NFKC', no_marks)
+
+
 if __name__ == '__main__':
     order = '“Herr Voß: • ½ cup of Œtker™ caffè latte • bowl of açaí.”'
     # Only the letters “è”, “ç”, and “í” were replaced.
     print(shave_marks(order))
     Greek = 'Ζέφυρος, Zéfiro'
     print(shave_marks(Greek))  # Both “έ” and “é” were replaced.
+    print(dewinize(order))
+    print(asciize(order))
