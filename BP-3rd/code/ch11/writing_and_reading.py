@@ -9,3 +9,8 @@ f = open('somefile.txt', 'w')
 f.write("Hello, ")
 f.write("World!")
 f.close()
+
+f = open('somefile.txt', 'r')
+f.read(4)
+f.read()
+f.close()

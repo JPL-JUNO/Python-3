@@ -1,0 +1,1 @@
+cat somefile.txt | python somescript.py | sort
