@@ -1,0 +1,378 @@
+\chapter{再谈抽象\label{chapter07}}
+创建自定义对象（尤其是对象类型或类）是一个Python核心概念。事实上，这个概念非常重要，以至于Python与Smalltalk、C++、Java等众多语言一样，被视为一种面向对象的语言。
+
+\section{对象魔法}
+在面向对象编程中，术语\important{对象大致意味着一系列数据（属性）以及一套访问和操作这些数据的方法}。
+
+下面列出了使用对象的最重要的好处。
+\begin{dinglist}{43}
+    \item 多态：可对不同类型的对象执行相同的操作，而这些操作就像“被施了魔法”一样能够正常运行。
+    \item 封装：对外部隐藏有关对象工作原理的细节。
+    \item 继承：可基于通用类创建出专用类。
+\end{dinglist}
+
+\subsection{多态}
+术语多态（polymorphism）源自希腊语，意思是``有多种形态”。\tips{这大致意味着即便你不知道变量指向的是哪种对象，也能够对其执行操作，且操作的行为将随对象所属的类型（类）而异}。
+\subsection{多态和方法}
+你收到一个对象，却根本不知道它是如何实现的——它可能是众多``形态”中的任何一种。与对象属性相关联的函数称为方法。
+
+\subsubsection{多态形式多样}
+每当无需知道对象是什么样的就能对其执行操作时，都是多态在起作用。这不仅仅适用于方法，我们还通过内置运算符和函数大量使用了多态。
+\begin{pyc}
+1 + 2  # 3
+'Fish ' + 'license'  # 'Fish license'
+\end{pyc}
+
+如果要编写一个函数，通过打印一条消息来指出对象的长度，可以像下面这样做（它对参数的唯一要求是有长度，可对其执行函数len）。
+
+\begin{pyc}
+def length_message(x):
+    print('The length of', repr(x), 'is', len(x))
+length_message('Hello, world!')  # The length of 'Hello, world!' is 13
+length_message([1, 2, 3])  # The length of [1, 2, 3] is 3
+\end{pyc}
+
+repr是多态的集大成者之一，可用于任何对象。
+
+要破坏多态，唯一的办法是使用诸如type、issubclass等函数显式地执行类型检查，但你应尽可能避免以这种方式破坏多态。
+
+\begin{tcolorbox}
+    这里讨论的多态形式是Python编程方式的核心，有时称为鸭子类型。鸭子类型（英语：duck typing）在程序设计中是动态类型的一种风格。在这种风格中，一个对象有效的语义，不是由继承自特定的类或实现特定的接口，而是由“当前方法和属性的集合”决定。在鸭子类型中，关注点在于对象的行为，能做什么；而不是关注对象所属的类型。例如，在不使用鸭子类型的语言中，我们可以编写一个函数，它接受一个类型为“鸭子”的对象，并调用它的“走”和“叫”方法。在使用鸭子类型的语言中，这样的一个函数可以接受一个任意类型的对象，并调用它的“走”和“叫”方法。如果这些需要被调用的方法不存在，那么将引发一个运行时错误。任何拥有这样的正确的“走”和“叫”方法的对象都可被函数接受的这种行为引出了以上表述，这种决定类型的方式因此得名。有关鸭子类型的详细信息，请参阅\href{http://en.wikipedia.org/wiki/Duck_typing}{鸭子类型}。
+\end{tcolorbox}
+
+\subsection{封装}
+封装（encapsulation）指的是向外部隐藏不必要的细节。这听起来有点像多态（无需知道对象的内部细节就可使用它）。这两个概念很像，因为它们都是抽象的原则。它们都像函数一样，可帮助你处理程序的组成部分，让你无需关心不必要的细节。
+
+\important{
+    但封装不同于多态。多态让你无需知道对象所属的类（对象的类型）就能调用其方法，而封装让你无需知道对象的构造就能使用它。
+}
+
+属性是归属于对象的变量，就像方法一样。实际上，方法差不多就是与函数相关联的属性。
+
+对象的状态由其属性（如名称）描述。对象的方法可能修改这些属性，因此对象将一系列函数（方法）组合起来，并赋予它们访问一些变量（属性）的权限，而属性可用于在两次函数调用之间存储值。
+
+\subsection{继承}
+继承是另一种偷懒的方式（这里是褒义）。如果你已经有了一个类，并要创建一个与之很像的类（可能只是新增了几个方法），该如何办呢？创建这个新类时，你不想复制旧类的代码，将其粘贴到新类中。
+
+\section{类}
+\subsection{类到底是什么}
+前面反复提到了类，并将其用作类型的同义词。从很多方面来说，这正是类的定义------一种对象。每个对象都属于特定的类，并被称为该类的实例。一个类的对象为另一个类的对象的子集时，前者就是后者的子类，后者是前者的超类。
+
+\begin{tcolorbox}
+    在英语日常交谈中，使用复数来表示类，如birds（鸟类）和larks（云雀）。在Python中，约定使用单数并将首字母大写，如Bird和Lark。
+\end{tcolorbox}
+
+通过这样的陈述，子类和超类就很容易理解。但在面向对象编程中，子类关系意味深长，因为类是由其支持的方法定义的。类的所有实例都有该类的所有方法，因此子类的所有实例都有超类的所有方法。有鉴于此，要定义子类，只需定义多出来的方法（还可能重写一些既有的方法）。
+\subsection{创建自定义类}
+\begin{pyc}
+class Person():
+    def set_name(self, name):
+        self.name = name
+
+    def get_name(self):
+        return self.name
+
+    def greet(self):
+        print("Hello, world! I'm {}".format(self.name))
+\end{pyc}
+这个示例包含三个方法定义，它们类似于函数定义，但位于class语句内。Person当然是类的名称。class语句创建独立的命名空间，用于在其中定义函数（参见7.2.5节）。一切看起来都挺好，但你可能想知道参数self是什么。它指向对象本身。那么是哪个对象呢？下面通过创建两个实例来说明这一点。
+\begin{pyc}
+foo = Person()
+bar = Person()
+foo.set_name('Luke Skywalker')
+bar.set_name('Anakin Skywalker')
+foo.greet()  # Hello, world! I'm Luke Skywalker.
+bar.greet()  # Hello, world! I'm Anakin Skywalker.
+\end{pyc}
+个示例可能有点简单，但澄清了self是什么。对foo调用\verb|set_name|和greet时，foo都会作为第一个参数自动传递给它们。将这个参数命名为self，这非常贴切。实际上，可以随便给这个参数命名，但鉴于它总是指向对象本身，因此习惯上将其命名为self。
+
+显然，self很有用，甚至必不可少。如果没有它，所有的方法都无法访问对象本身------要操作的属性所属的对象。
+
+\begin{tcolorbox}
+    如果foo是一个Person实例，可将foo.greet()视为Person.greet(foo)的简写，但后者的多态性更低。
+\end{tcolorbox}
+
+\subsection{属性、函数和方法}
+方法（更准确地说是关联的方法）将其第一个参数关联到它所属的实例，因此无需提供这个参数。无疑可以将属性关联到一个普通函数，但这样就没有特殊的self参数了。
+
+\begin{pyc}
+class Class:
+    def method(self):
+        print("I have a self!")
+def function():
+    print("I don't...")
+instance = Class()
+instance.method()  # I have a self!
+instance.method = function
+instance.method()  # I don't...
+\end{pyc}
+\important{请注意，有没有参数self并不取决于是否以刚才使用的方式（如instance.method）调用方法}。实际上，完全可以让另一个变量指向同一个方法。
+\begin{pyc}
+    class Bird():
+    song = 'Squaawk!'
+    def sing(self):
+        print(self.song)
+bird = Bird()
+bird.sing()  # Squaawk!
+birdsong = bird.sing
+birdsong()  # Squaawk!
+\end{pyc}
+虽然最后一个方法调用看起来很像函数调用，但变量birdsong指向的是关联的方法bird.sing，这意味着它也能够访问参数self（即它也被关联到类的实例）。
+
+\subsection{再谈隐藏}
+默认情况下，可从外部访问对象的属性。有些程序员认为这没问题，但有些程序员（如Smalltalk之父）认为这违反了封装原则。他们认为应该对外部完全隐藏对象的状态（即不能从外部访问它们）。
+
+关键是其他程序员可能不知道（也不应知道）对象内部发生的情况。为避免这类问题，可将属性定义为私有。私有属性不能从对象外部访问，而只能通过存取器方法（如\verb|get_name|和\verb|set_name|）来访问。
+
+Python没有为私有属性提供直接的支持，而是要求程序员知道在什么情况下从外部修改属性是安全的。毕竟，你必须在知道如何使用对象之后才能使用它。
+
+要让方法或属性成为私有的（不能从外部访问），只需让其名称以两个下划线打头即可。
+\begin{pyc}
+class Secretive():
+    def __inaccessible(self):
+        print("Bet you can't see me...")
+
+    def accessible(self):
+        self.__inaccessible()
+s = Secretive()
+s.__inaccessible  # 'Secretive' object has no attribute '__inaccessible'
+s.accessible()  # Bet you can't see me...
+\end{pyc}
+现在从外部不能访问\verb|__inaccessible|，但在类中（如accessible中）依然可以使用它。
+
+\important{虽然以两个下划线打头有点怪异，但这样的方法类似于其他语言中的标准私有方法。然而，幕后的处理手法并不标准：在类定义中，对所有以两个下划线打头的名称都进行转换，即在开头加上一个下划线和类名}。
+
+\verb|s._Secretive__inaccessible()  # Bet you can't see me...|
+
+总之，你无法禁止别人访问对象的私有方法和属性，但这种名称修改方式发出了强烈的信号，让他们不要这样做。
+
+如果你不希望名称被修改，又想发出不要从外部修改属性或方法的信号，可用一个下划线打头。这虽然只是一种约定，但也有些作用。例如，\verb|from module import *|不会导入以一个下划线打头的名称\footnote{对于成员变量（属性），有些语言支持多种私有程度。例如，Java支持4种不同的私有程度。Python没有提供这样的支持，不过从某种程度上说，以一个和两个下划线打头相当于两种不同的私有程度。}。
+
+\subsection{类的命名空间}
+在class语句中定义的代码都是在一个特殊的命名空间（类的命名空间）内执行的，而类的所有成员都可访问这个命名空间。类定义其实就是要执行的代码段，并非所有的Python程序员都知道这一点，但知道这一点很有帮助。
+
+\begin{pyc}
+class MemberCounter:
+    members = 0
+    def init(self):
+        MemberCounter.members += 1
+m1 = MemberCounter()
+m1.init()
+MemberCounter.members  # 1
+m2 = MemberCounter()
+m2.init()
+MemberCounter.members  # 2
+\end{pyc}
+上述代码在类作用域内定义了一个变量，所有的成员（实例）都可访问它，这里使用它来计算类实例的数量。
+
+每个实例都可访问这个类作用域内的变量，就像方法一样。如果你在一个实例中给属性members赋值，结果将如何呢？
+\begin{pyc}
+m1.members = "Two"
+m1.members  # 'Two'
+m2.members  # 2
+\end{pyc}
+新值被写入m1的一个属性中，这个属性遮住了类级变量。
+\subsection{指定超类}
+要指定超类，可在class语句中的类名后加上超类名，并将其用圆括号括起。
+\begin{pyc}
+class Filter():
+    def init(self):
+        self.blocked = []
+    def filter(self, sequence):
+        return [x for x in sequence if x not in self.blocked]
+class SPAMFilter(Filter):  # SPAMFilter is a subclass of Filter
+    def init(self):  # Overrides init method from Filter superclass
+        self.blocked = ['SPAM']
+
+f = Filter()
+f.init()
+f.filter([1, 2, 3])  # [1, 2, 3]
+
+s = SPAMFilter()
+s.init()
+s.filter(["SPAM", "SPAM", "bacon", "SPAM", "SPAM", "Eggs"])
+# ['bacon', 'Eggs']
+\end{pyc}
+Filter是一个过滤序列的通用类。实际上，它不会过滤掉任何东西。Filter类的用途在于可用作其他类（如将'SPAM'从序列中过滤掉的SPAMFilter类）的基类（超类）。
+
+请注意SPAMFilter类的定义中有两个要点。
+\begin{dinglist}{43}
+    \item 以提供新定义的方式重写了Filter类中方法init的定义。
+    \item 直接从Filter类继承了方法filter的定义，因此无需重新编写其定义。
+\end{dinglist}
+第二点说明了继承很有用的原因：可以创建大量不同的过滤器类，它们都从Filter类派生而来，并且都使用已编写好的方法filter。
+
+\subsection{深入探讨继承}
+\begin{itemize}
+    \item 要确定一个类是否是另一个类的子类，可使用内置方法\verb|issubclass|。
+    \item 如果你有一个类，并想知道它的基类，可访问其特殊属性\verb|__bases__|。
+    \item 要确定对象是否是特定类的实例，可使用\verb|isinstance|。
+    \item 如果你要获悉对象属于哪个类，可使用属性\verb|__class__|。
+\end{itemize}
+
+\begin{pyc}
+issubclass(SPAMFilter, Filter)  # True
+issubclass(Filter, SPAMFilter)  # False
+
+SPAMFilter.__bases__  # (__main__.Filter,)
+Filter.__bases__  # (object,)
+
+s = SPAMFilter()
+isinstance(s, SPAMFilter)  # True
+isinstance(s, Filter)  # True
+isinstance(s, str)  # False
+\end{pyc}
+\begin{tcolorbox}
+    使用isinstance通常不是良好的做法，依赖多态在任何情况下都是更好的选择。一个重要的例外情况是使用抽象基类和模块abc时。
+\end{tcolorbox}
+
+\subsection{多个超类}
+你肯定注意到了一个有点奇怪的细节：复数形式的\verb|__bases__|。前面说过，你可使用它来获悉类的基类，而基类可能有多个。
+\begin{pyc}
+class Calculator:
+    def calculate(self, expression):
+        self.value = eval(expression)
+class Talker:
+    def talk(self):
+        print('Hi, my value is', self.value)
+class TalkingCalculator(Calculator, Talker):
+    pass
+\end{pyc}
+子类TalkingCalculator本身无所作为，其所有的行为都是从超类那里继承的。关键是通过从Calculator那里继承calculate，并从Talker那里继承talk，它成了会说话的计算器。
+\begin{pyc}
+tc = TalkingCalculator()
+tc.calculate('1 + 2 * 3')
+tc.talk()  # Hi, my value is 7
+\end{pyc}
+这被称为多重继承，是一个功能强大的工具。然而，除非万不得已，否则应避免使用多重继承，因为在有些情况下，它可能带来意外的``并发症”。
+
+使用多重继承时，有一点务必注意：如果多个超类以不同的方式实现了同一个方法（即有多个同名方法），必须在class语句中小心排列这些超类，因为位于前面的类的方法将覆盖位于后面的类的方法。因此，在前面的示例中，如果Calculator类包含方法talk，那么这个方法将覆盖Talker类的方法talk（导致它不可访问）。
+
+\subsection{接口和内省}
+接口这一概念与多态相关。处理多态对象时，你只关心其接口（协议）——\important{\textbf{对外}暴露的方法和属性}。
+
+通常，你要求对象遵循特定的接口（即实现特定的方法），但如果需要，也可非常灵活地提出要求：不是直接调用方法并期待一切顺利，而是检查所需的方法是否存在；如果不存在，就改弦易辙。
+\begin{pyc}
+hasattr(tc, 'talk')  # True
+hasattr(tc, 'fnord')  # False
+\end{pyc}
+
+\begin{pyc}
+callable(getattr(tc, 'talk', None))  # True
+callable(getattr(tc, 'fnord', None))  # False
+\end{pyc}
+请注意，这里没有在if语句中使用hasattr并直接访问属性，而是使用了getattr（它让我能够指定属性不存在时使用的默认值，这里为None），然后对返回的对象调用callable。
+\begin{tcolorbox}
+    setattr与getattr功能相反，可用于设置对象的属性：
+    \begin{pyc}
+setattr(tc, 'name', 'Mr. Gumby')
+tc.name  # 'Mr. Gumby'
+    \end{pyc}
+\end{tcolorbox}
+
+要查看对象中存储的所有值，可检查其\verb|__dict__|属性。如果要确定对象是由什么组成的，应研究模块inspect。这个模块主要供高级用户创建对象浏览器（让用户能够以图形方式浏览Python对象的程序）以及其他需要这种功能的类似程序。
+
+\subsection{抽象基类}
+然而，有比手工检查各个方法更好的选择。在历史上的大部分时间内，Python几乎都只依赖于鸭子类型，即假设所有对象都能完成其工作，同时偶尔使用hasattr来检查所需的方法是否存在。很多其他语言（如Java和Go）都采用显式指定接口的理念，而有些第三方模块提供了这种理念的各种实现。最终，Python通过引入模块abc提供了官方解决方案。这个模块为所谓的抽象基类提供了支持。一般而言，\notes{抽象类是不能（至少是不应该）实例化的类，其职责是定义子类应实现的一组抽象方法}。
+\begin{pyc}
+from abc import ABC, abstractmethod
+class Talker(ABC):
+    @abstractmethod
+    def talk(self):
+        pass
+\end{pyc}
+形如@this的东西被称为装饰器，这里的要点是你使用@abstractmethod来将方法标记为抽象的——\important{在子类中必须实现的方法}。抽象类（即包含抽象方法的类）最重要的特征是不能实例化。\\
+\verb|Talker()  # TypeError: Can't instantiate abstract class Talker with abstract method talk|
+
+假设像下面这样从它派生出一个子类：
+\begin{pyc}
+class Knigget(Talker):
+    pass
+\end{pyc}
+由于没有重写方法talk，因此这个类也是抽象的，不能实例化。然而，你可重新编写这个类，使其实现要求的方法。
+\begin{pyc}
+class Knigget(Talker):
+    def talk(self):
+        print("Ni!")
+\end{pyc}
+
+现在实例化它没有任何问题。\tips{这是抽象基类的主要用途，而且只有在这种情形下使用isinstance才是妥当的：如果先检查给定的实例确实是Talker对象，就能相信这个实例在需要的情况下有方法talk}。
+
+\begin{pyc}
+k = Knigget()
+isinstance(k, Talker)  # True
+k.talk()  # Ni!
+\end{pyc}
+
+然而，还缺少一个重要的部分——让isinstance的多态程度更高的部分。正如你看到的，\notes{抽象基类让我们能够本着鸭子类型的精神使用这种实例检查！我们不关心对象是什么，只关心对象能做什么（它实现了哪些方法）}。因此，只要实现了方法talk，即便不是Talker的子类，依然能够通过类型检查。
+
+下面来创建另一个类：
+\begin{pyc}
+class Herring:
+    def talk(self):
+        print('Blub.') 
+\end{pyc}
+
+这个类的实例能够通过是否为Talker对象的检查，但是检查的结果：它并不是Talker对象。
+\begin{pyc}
+h = Herring()
+isinstance(h, Talker)  # False
+\end{pyc}
+
+诚然，你可从Talker派生出Herring，这样就万事大吉了，但Herring可能是从他人的模块中导入的。在这种情况下，就无法采取这样的做法。为解决这个问题，你可将Herring注册为Talker（而不从Herring和Talker派生出子类），这样所有的Herring对象都将被视为Talker对象。
+\begin{pyc}
+Talker.register(Herring)  # __main__.Herring
+isinstance(h, Talker)  # True
+issubclass(Herring, Talker)  # True
+\end{pyc}
+
+然而，这种做法存在一个缺点，就是直接从抽象类派生提供的保障没有了。
+\begin{pyc}
+class Clam:
+    pass
+Talker.register(Clam)  # __main__.Clam
+issubclass(Clam, Talker)  # True
+c = Clam()
+isinstance(c, Talker)  # True
+c.talk()  # AttributeError: 'Clam' object has no attribute 'talk'
+\end{pyc}
+换而言之，\important{应将isinstance返回True视为一种意图表达}。在这里，Clam有成为Talker的意图。本着鸭子类型的精神，我们相信它能承担Talker的职责，但可悲的是它失败了（\notes{这里是Clam没有重写方法，使用register跳过了重写的要求，否则根本不能实例化}）。
+
+标准库（如模块collections.abc）提供了多个很有用的抽象类，有关模块abc的详细信息，请参阅标准库参考手册。
+
+\section{关于面向对象设计的一些思考}
+专门探讨面向对象程序设计的图书很多，虽然这并非本书的重点，但还是要提供一些指南。
+\begin{dinglist}{43}
+    \item 将相关的东西放在一起。如果一个函数操作一个全局变量，最好将它们作为一个类的属性和方法。
+    \item 不要让对象之间过于亲密。方法应只关心其所属实例的属性，对于其他实例的状态，让它们自己去管理就好了。
+    \item 慎用继承，尤其是多重继承。继承有时很有用，但在有些情况下可能带来不必要的复杂性。要正确地使用多重继承很难，要排除其中的bug更难。
+    \item 保持简单。让方法短小紧凑。一般而言，应确保大多数方法都能在30秒内读完并理解。对于其余的方法，尽可能将其篇幅控制在一页或一屏内。
+\end{dinglist}
+
+确定需要哪些类以及这些类应包含哪些方法时，尝试像下面这样做。
+\begin{enumerate}
+    \item 将有关问题的描述（程序需要做什么）记录下来，并给所有的名词、动词和形容词加上标记。
+    \item 在名词中找出可能的类。
+    \item 在动词中找出可能的方法。
+    \item 在形容词中找出可能的属性。
+    \item 将找出的方法和属性分配给各个类。
+\end{enumerate}
+
+有了面向对象模型的草图后，还需考虑类和对象之间的关系（如继承或协作）以及它们的职责。为进一步改进模型，可像下面这样做。
+\begin{enumerate}
+    \item 记录（或设想）一系列用例，即使用程序的场景，并尽力确保这些用例涵盖了所有的功能。
+    \item 透彻而仔细地考虑每个场景，确保模型包含了所需的一切。如果有遗漏，就加上；如果有不太对的地方，就修改。不断地重复这个过程，直到对模型满意为止。
+\end{enumerate}
+
+\section{小结}
+本章不仅介绍了有关Python语言的知识，还介绍了多个你可能一点都不熟悉的概念。下面来总结一下。
+\begin{dinglist}{43}
+    \item 对象：对象由属性和方法组成。属性不过是属于对象的变量，而方法是存储在属性中的函数。相比于其他函数，（关联的）方法有一个不同之处，那就是它总是将其所属的对象作为第一个参数，而这个参数通常被命名为self。
+    \item 类：类表示一组（或一类）对象，而每个对象都属于特定的类。类的主要任务是定义其实例将包含的方法。
+    \item 多态：多态指的是能够同样地对待不同类型和类的对象，即无需知道对象属于哪个类就可调用其方法。
+    \item  封装：对象可能隐藏（封装）其内部状态。在有些语言中，这意味着对象的状态（属性）只能通过其方法来访问。在Python中，所有的属性都是公有的，但直接访问对象的状态时程序员应谨慎行事，因为这可能在不经意间导致状态不一致。
+    \item  继承：一个类可以是一个或多个类的子类，在这种情况下，子类将继承超类的所有方法。你可指定多个超类，通过这样做可组合正交（独立且不相关）的功能。为此，一种常见的做法是使用一个核心超类以及一个或多个混合超类。
+    \item  接口和内省：一般而言，你无需过于深入地研究对象，而只依赖于多态来调用所需的方法。然而，如果要确定对象包含哪些方法或属性，有一些函数可供你用来完成这种工作。
+    \item  抽象基类：使用模块abc可创建抽象基类。抽象基类用于指定子类必须提供哪些功能，却不实现这些功能。
+    \item  面向对象设计：关于该如何进行面向对象设计以及是否该采用面向对象设计，有很多不同的观点。无论你持什么样的观点，都必须深入理解问题，进而创建出易于理解的设计。
+\end{dinglist}

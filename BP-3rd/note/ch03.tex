@@ -1,0 +1,355 @@
+\chapter{使用字符串\label{chapter03}}
+\section{字符串基本操作}
+所有标准序列操作（索引、切片、乘法、成员资格检查、长度、最小值和最大值）都适用于字符串，但别忘了字符串是不可变的，因此所有的元素赋值和切片赋值都是非法的。
+\begin{pyc}
+website = 'http://www.python.org'
+website[-3:] = 'com'  # str' object does not support item assignment
+\end{pyc}
+\section{设置字符串格式：精简版}
+将值转换为字符串并设置其格式是一个重要的操作，需要考虑众多不同的需求。以前，主要的解决方案是使用字符串格式设置运算符——百分号。在\%左边指定一个字符串（格式字符串），并在右边指定要设置其格式的值。指定要设置其格式的值时，可使用单个值（如字符串或数字），可使用元组（如果要设置多个值的格式），还可使用字典，其中最常见的是元组。
+\begin{pyc}
+format = "Hello, %s. %s enough for ya?"
+values = ("world", "Hot")
+format % values
+\end{pyc}
+上述格式字符串中的 \%s 称为转换说明符，指出了要将值插入什么地方。s意味着将值视为字符串进行格式设置。如果指定的值不是字符串，将使用str将其转换为字符串。
+
+可能遇到的另一种解决方案是所谓的模板字符串。它使用类似于UNIX shell的语法，旨在简化基本的格式设置机制:
+\begin{pyc}
+from string import Template
+tmpl = Template("Hello, $who! $what enough for ya?")
+tmpl.substitute(who="Mars", what="Dusty")
+\end{pyc}
+
+编写新代码时，应选择使用字符串方法format，它融合并强化了早期方法的优点。使用这种方法时，每个替换字段都用花括号括起，其中可能包含名称，还可能包含有关如何对相应的值进行转换和格式设置的信息。
+
+在最简单的情况下，替换字段没有名称或将索引用作名称：
+\begin{pyc}
+"{}, {}, {}".format("first", "second", "third")  # 'first, second, third'
+"{2}, {0}, {1}".format("first", "second", "third")  # 'third, first, second'
+
+"{3} {0} {2} {1} {3} {0}".format("be", "not", "or", "to")
+# 'to be or not to be'
+\end{pyc}
+
+命名字段的工作原理与你预期的完全相同。
+\begin{pyc}
+from math import pi
+"{name} is approximately {value:.2f}.".format(value=pi, name="pi")
+# 'pi is approximately 3.14.'
+\end{pyc}
+
+如果变量与替换字段同名，还可使用一种简写。在这种情况下，可使用\verb|f|字符串——在字符串前面加上\verb|f|。
+\begin{pyc}
+from math import e
+f"Euler's constant is roughly {e}."
+# "Euler's constant is roughly 2.718281828459045."
+\end{pyc}
+
+这与下面这个更明确一些的表达式等价：
+\begin{pyc}
+"Euler's constant is roughly {e}.".format(e=e)
+# "Euler's constant is roughly 2.718281828459045."
+\end{pyc}
+
+\section{设置字符串格式：完整版}
+字符串格式设置涉及的内容很多，因此即便是这里的完整版也无法全面探索所有的细节，而只是介绍主要的组成部分。这里的\important{基本思想是对字符串调用方法format，并提供要设置其格式的值}。字符串包含有关如何设置格式的信息，而这些信息是使用一种微型格式指定语言（\emph{mini-language}）指定的。每个值都被插入字符串中，以替换用花括号括起的\textbf{替换字段}。要在最终结果中包含花括号，可在格式字符串中使用两个花括号（即\{\{或\}\}）来指定。
+
+替换字段由如下部分组成，其中每个部分
+都是可选的。
+\begin{dinglist}{43}
+    \item \textbf{字段名}：索引或标识符，指出要设置哪个值的格式并使用结果来替换该字段。除指定值外，还可指定值的特定部分，如列表的元素。
+    \item \textbf{转换标志}：\important{跟在叹号后面的单个字符}。当前支持的字符包括r（表示repr）、s（表示str）和a（表示ascii）。如果你指定了转换标志，将不使用对象本身的格式设置机制，而是使用指定的函数将对象转换为字符串，再做进一步的格式设置。
+    \item \textbf{格式说明符}：\important{跟在冒号后面的表达式}。格式说明符让我们能够详细地指定最终的格式，包括格式类型（如字符串、浮点数或十六进制数），字段宽度和数的精度，如何显示符号和千位分隔符，以及各种对齐和填充方式。
+\end{dinglist}
+\subsection{替换字段-字段名}
+在最简单的情况下，只需向format提供要设置其格式的未命名参数，并在格式字符串中使用未命名字段。此时，将按顺序将字段和参数配对。
+\begin{pyc}
+"{}, {}".format(2, 7)  # '2, 7'
+\end{pyc}
+还可给参数指定名称，这种参数将被用于相应的替换字段中。你可混合使用这两种方法。
+\begin{pyc}
+"{foo}, {bar}".format(bar=2, foo=7)  # '7, 2' 
+"{foo}, {}, {bar}".format(1, bar=2, foo=7)  # '7, 1, 2' 
+\end{pyc}
+你并非只能使用提供的值本身，而是可访问其组成部分。
+\begin{pyc}
+fullname = ["Alfred", "Smoketoomuch"]
+"Mr {name[1]}".format(name=fullname)  # 'Mr Smoketoomuch'
+
+import math
+tmpl = "The {mod.__name__} module defines the value {mod.pi} for pi."
+tmpl.format(mod=math)
+# 'The math module defines the value 3.141592653589793 for pi.'
+\end{pyc}
+\subsection{替换字段-转换标志}
+指定要在字段中包含的值后，就可添加有关如何设置其格式的指令了。首先，可以提供一个转换标志。
+\begin{pyc}
+print("{pi!s} {pi!r} {pi!a}".format(pi="a"))
+\end{pyc}
+
+\subsection{替换字段-格式说明符}
+你可以指定要转换的值是哪种类型，更准确地说，是要将其视为哪种类型，见\autoref{StringFormatTypeDescription}
+\begin{pyc}
+"The number is {num}".format(num=42)  # 'The number is 42'
+"The number is {num:f}".format(num=42)  # 'The number is 42.000000'
+"The number is {num:b}".format(num=42)  # 'The number is 101010'
+\end{pyc}
+
+\begin{table}
+    \caption{字符串格式设置中的类型说明符}
+    \label{StringFormatTypeDescription}
+    \begin{tabularx}{\textwidth}{lX}
+        \hline
+        类型 & 含义                                               \\
+        \hline
+        b  & 将整数表示为二进制数                                       \\
+        c  & 将整数解读为Unicode码点                                  \\
+        d  & 将整数视为十进制数进行处理，这是整数默认使用的说明符                       \\
+        e  & 使用科学表示法来表示小数（用e来表示指数）                            \\
+        E  & 与e相同，但使用E来表示指数                                   \\
+        f  & 将小数表示为定点数                                        \\
+        F  & 与f相同，但对于特殊值（nan和inf），使用大写表示                      \\
+        g  & 自动在定点表示法和科学表示法之间做出选择。这是默认用于小数的说明符，但在默认情况下至少有1位小数 \\
+        G  & 与g相同，但使用大写来表示指数和特殊值                              \\
+        n  & 与g相同，但插入随区域而异的数字分隔符                              \\
+        o  & 将整数表示为八进制数                                       \\
+        s  & 保持字符串的格式不变，这是默认用于字符串的说明符                         \\
+        x  & 将整数表示为十六进制数并使用小写字母                               \\
+        X  & 与x相同，但使用大写字母                                     \\
+        \% & 将数表示为百分比值（乘以100，按说明符f设置格式，再在后面加上\%）              \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection{宽度、精度和千位分隔符}
+宽度是使用整数指定的，数和字符串的对齐方式不同。
+\begin{pyc}
+"{num:10}".format(num=3)
+# '         3'
+"{name:10}".format(name="Stephen")
+# 'Stephen   '
+\end{pyc}
+
+精度也是使用整数指定的，但需要在它前面加上一个表示小数点的句点。
+\begin{pyc}
+"Pi day is {pi:.2f}".format(pi=pi)  # 'Pi day is 3.14'
+"{pi:10.2f}".format(pi=pi)  # '      3.14'
+\end{pyc}
+
+可使用逗号来指出你要添加千位分隔符：
+\begin{pyc}
+"One googol is {:,}".format(10 ** 100)
+# 'One googol is 10,000,000,000,000,000,000,000,000,000,000,000,000,000,000,00
+# 0,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000'
+\end{pyc}
+\subsubsection{符号、对齐和用 0 填充}
+有很多用于设置数字格式的机制，比如便于打印整齐的表格。在大多数情况下，只需指定宽度和精度，但包含负数后，原本漂亮的输出可能不再漂亮。在指定宽度和精度的数前面，可添加一个标志。这个标志可以是零、加号、减号或空格，其中零表示使用0来填充数字。要指定左对齐、右对齐和居中，可分别使用\verb|<|、\verb|>|和\verb|^|。
+\begin{pyc}
+"{:010.2f}".format(pi)  # '0000003.14'
+print("{0:<10.2f}\n{0:^10.2f}\n{0:>10.2f}".format(pi))
+# 3.14      
+#    3.14   
+#       3.14
+\end{pyc}
+可以使用填充字符来扩充对齐说明符，这样将使用指定的字符而不是默认的空格来填充。还有更具体的说明符=，它指定将填充字符放在符号和数字之间。
+\begin{pyc}
+print("{0:10.2f}\n{1:10.2f}".format(pi, -pi))
+#      3.14
+#     -3.14
+print("{0:10.2f}\n{1:=10.2f}".format(pi, -pi))
+#      3.14
+#-     3.14
+\end{pyc}
+
+如果要给正数加上符号，可使用说明符+（将其放在格式说明符后面），而不是默认的-。如果将符号说明符指定为空格，会在正数前面加上空格而不是+。
+\begin{pyc}
+print("{0:-.2}\n{1:-.2}".format(pi, -pi))  # default
+# 3.1
+# -3.1
+print("{0:+.2}\n{1:+.2}".format(pi, -pi))
+# +3.1
+# -3.1
+print("{0: .2}\n{1: .2}".format(pi, -pi))
+#  3.1
+# -3.1
+\end{pyc}
+
+最后一个要素是井号（\#）选项，你可将其放在符号说明符和宽度之间（如果指
+定了这两种设置）。这个选项将触发另一种转换方式，转换细节随类型而异。
+\begin{pyc}
+"{:b}".format(42)  # '101010'
+"{:#b}".format(42)  # '0b101010'
+
+"{:g}".format(42)  # '42'
+"{:#g}".format(42)  # '42.0000'
+\end{pyc}
+
+\begin{py}{字符串格式设置示例}
+width = int(input("Please enter width: "))
+
+price_width = 10
+item_width = width - price_width
+
+header_fmt = "{{:{}}}{{:>{}}}".format(item_width, price_width)
+fmt = "{{:{}}}{{:>{}.2f}}".format(item_width, price_width)
+
+print("=" * width)
+print(header_fmt.format("Item", "Price"))
+
+print('-' * width)
+print(fmt.format('Apples', 0.4))
+print(fmt.format('Pears', 0.5))
+print(fmt.format('Cantaloupes', 1.92))
+print(fmt.format('Dried Apricots (16 oz.)', 8))
+print(fmt.format('Prunes (4 lbs.)', 12))
+print('=' * width)
+
+# ===================================
+# Item                          Price
+# -----------------------------------
+# Apples                         0.40
+# Pears                          0.50
+# Cantaloupes                    1.92
+# Dried Apricots (16 oz.)        8.00
+# Prunes (4 lbs.)               12.00
+# ===================================
+\end{py}
+\section{字符串方法}
+相比于列表，字符串的方法要多得多，因为其很多方法都是从模块string那里“继承”而来的。
+
+\explain{模块string未死}{
+虽然字符串方法完全盖住了模块string的风头，但这个模块包含一些字符串没有的常量
+和函数。下面就是模块string中几个很有用的常量。
+\begin{dinglist}{43}
+\item  string.digits：包含数字0-9的字符串。
+\item  string.ascii\_letters：包含所有ASCII字母（大写和小写）的字符串。
+\item  string.ascii\_lowercase：包含所有小写ASCII字母的字符串。
+\item  string.printable：包含所有可打印的ASCII字符的字符串。
+\item  string.punctuation：包含所有ASCII标点字符的字符串。
+\item  string.ascii\_uppercase：包含所有大写ASCII字母的字符串。
+\end{dinglist}
+虽然说的是ASCII字符，但值实际上是未解码的Unicode字符串。
+}
+
+\subsection{center}
+方法 center 通过在两边添加填充字符（默认为空格）让字符串居中。
+\begin{pyc}
+"The Middle by Jimmy Eat World".center(39)
+# '     The Middle by Jimmy Eat World     '
+"The Middle by Jimmy Eat World".center(39, "*")
+# '*****The Middle by Jimmy Eat World*****'
+\end{pyc}
+\subsection{find}
+方法find在字符串中查找子串。如果找到，就\important{返回子串的第一个字符的索引}，否则返回-1。
+\begin{pyc}
+'With a moo-moo here, and a moo-moo there'.find('moo')  # 7
+title = "Monty Python's Flying Circus"
+title.find("Python")  # 6
+title.find("Flying")  # 15
+title.find("Zirquss")  # -1
+\end{pyc}
+
+\warning{
+    字符串方法find返回的并非布尔值。如果find像这样返回0，就意味着它在索引0处找到了指定的子串。
+}
+
+你还可指定搜索的起点和终点（它们都是可选的），起点和终点值（第二个和第三个参数）指定的搜索范围包含起点，但不包含终点。
+
+\begin{pyc}
+subject = "$$$ Get rich now!!! $$$"
+subject.find("$$$")  # 0
+subject.find("$$$", 1)  # 20
+subject.find("!!!")  # 16
+subject.find("!!!", 0, 16)  # -1
+\end{pyc}
+
+\subsection{join}
+join是一个非常重要的字符串方法，其作用与split相反，用于合并序列的元素，\important{所合并序列的元素必须都是字符串}。
+\begin{pyc}
+seq = [1, 2, 3, 4, 5, 6]
+sep = "+"
+sep.join(seq)
+# sequence item 0: expected str instance, int found
+
+seq = ['1', '2', '3', '4', '5']
+sep.join(seq)  # '1+2+3+4+5'
+
+dirs = "", "usr", "bin", "env"
+'/'.join(dirs)  # '/usr/bin/env'
+print("C:"+"\\".join(dirs))  # C:\usr\bin\env
+\end{pyc}
+
+\subsection{lower}
+方法 lower 返回字符串的小写版本。在你编写代码时，如果不想区分字符串的大小写（即忽略大小写的差别），这将很有用。
+\begin{pyc}
+'Trondheim Hammer Dance'.lower()  # 'trondheim hammer dance'
+\end{pyc}
+
+一个与lower相关的方法是title，它将字符串转换为词首大写，即所有单词的首字母都大写，其他字母都小写。然而，它确定单词边界的方式可能导致结果不合理。另一种方法是使用模块string中的函数capwords。
+
+\begin{pyc}
+"that's all folks.".title()  # "That'S All Folks."
+
+import string
+string.capwords("that's all folks.")  # "That's All Folks."
+\end{pyc}
+
+当然，要实现真正的词首大写（根据你采用的写作风格，冠词、并列连词以及不超过5个字母的介词等可能全部小写），你得自己编写代码。
+\subsection{replace}
+方法 replace 将指定子串都替换为另一个字符串，并返回替换后的结果。
+\begin{pyc}
+"This is a test".replace("is", "eez")  # 'Theez eez a test'
+\end{pyc}
+\subsection{split}
+split 是一个非常重要的字符串方法，其作用与join相反，用于将字符串拆分为序列。如果没有指定分隔符，将默认在单个或多个连续的空白字符（空格、制表符、换行符等）处进行拆分。
+\begin{pyc}
+'1+2+3+4+5'.split('+')
+# ['1', '2', '3', '4', '5']
+'/usr/bin/env'.split('/')
+# ['', 'usr', 'bin', 'env']
+'Using the    default'.split()
+# ['Using', 'the', 'default']
+\end{pyc}
+\subsection{strip}
+方法 strip 将字符串开头和末尾的空白（但不包括中间的空白）删除，并返回删除后的结果。与lower一样，需要将输入与存储的值进行比较时，strip很有用。你还可在一个字符串参数中指定要删除哪些字符。
+\begin{pyc}
+' internal whitespace is kept '.strip()
+# 'internal whitespace is kept'
+names = ["gumby", "smith", "jones"]
+name = "gumby "
+if name in names:
+    print("Found it!")
+if name.strip() in names:
+    print("Found it!")  # Found it!
+
+'*** SPAM * for * everyone!!! ***'.strip(' *!')  # 'SPAM * for * everyone'
+\end{pyc}
+
+\subsection{translate}
+方法translate与replace一样替换字符串的特定部分，但不同的是它只能进行单字符替换。这个方法的优势在于能够同时替换多个字符，因此效率比replace高。
+
+假设你要将一段英语文本转换为带有德国口音的版本，为此必须将字符c和s分别替换为k和z。使用translate前必须创建一个转换表。这个转换表指出了不同Unicode码点之间的转换关系。要创建转换表，可对字符串类型str调用方法maketrans，这个方法接受两个参数：两个长度相同的字符串，它们指定要将第一个字符串中的每个字符都替换为第二个字符串中的相应字符。创建转换表后，就可将其用作方法translate的参数。
+
+\begin{pyc}
+table = str.maketrans('cs', 'kz')
+table  # {99: 107, 115: 122}
+'this is an incredible test'.translate(table)
+# 'thiz iz an inkredible tezt'
+\end{pyc}
+
+调用方法maketrans时，还可提供可选的第三个参数，指定要将哪些字母删除:
+\begin{pyc}
+table = str.maketrans('cs', 'kz', ' ')
+'this is an incredible test'.translate(table)  # 'thizizaninkredibletezt'
+\end{pyc}
+
+\subsection{判断字符串是否满足特定的条件}
+很多字符串方法都以is打头，如isspace、isdigit和isupper，它们判断字符串是否具有特定的性质（如包含的字符全为空白、数字或大写）。如果字符串具备特定的性质，这些方法就返回True，否则返回False。
+
+\section{小结}
+本章介绍了字符串的两个重要方面。
+\begin{dinglist}{43}
+    \item 字符串格式设置：求模运算符（\%）可用于将值合并为包含转换标志（如 s\% ）的字符串，这让你能够以众多方式设置值的格式。
+    \item 字符串方法。
+\end{dinglist}
