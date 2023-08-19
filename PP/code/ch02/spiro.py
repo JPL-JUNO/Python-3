@@ -6,7 +6,13 @@
 """
 import turtle
 import math
-from fractions import gcd
+# fractions.gcd(a, b) has been moved to the math module in Python 3.9.
+# from fractions import gcd
+from math import gcd
+import random
+from datetime import datetime
+from PIL import Image
+import argparse
 
 
 class Spiro:
@@ -21,10 +27,10 @@ class Spiro:
         self.step = 5
         # 设置了一个标志，将在动画中使用它，它会产生一组螺线。
         self.drawing_complete = False
-        self.setparams(xc, yc, col, R, r, l)
+        self.set_params(xc, yc, col, R, r, l)
         self.restart()
 
-    def setparams(self, xc, yc, col, R, r, l):
+    def set_params(self, xc, yc, col, R, r, l):
         # 设置函数
         self.xc = xc
         self.yc = yc
@@ -93,3 +99,148 @@ class Spiro:
         if self.a >= 360 * self.n_rot:
             self.drawing_complete = True
             self.t.hideturtle()
+
+    def clear(self):
+        # clear everything
+        self.t.clear()
+
+
+class SpiroAnimator:
+    """我们同时绘制随机的螺线。该类使用一个计时器，每次绘制
+    曲线的一段。这种技术定期更新图像，并允许程序处理事件，如按键、鼠标点击，等等。
+    """
+
+    def __init__(self, N):
+        # 以毫秒为单位的时间间隔，将用于定时器
+        self.delta_t = 10
+        # 保存海龟窗口的尺寸
+        self.width = turtle.window_width()
+        self.height = turtle.window_height()
+        self.spiros = []
+        for _ in range(N):
+            # 一个元组，需要传入到 Spiro 构造函数
+            r_params = self.gen_random_params()
+            # 创建一个新的 Spiro 对象，并将它添加到 Spiro 对象的列表中。
+            # 用 Python 的*运算符将元组转换为参数列表
+            spiro = Spiro(*r_params)
+            self.spiros.append(spiro)
+            # 设置 turtle.ontimer()方法每隔 DeltaT 毫秒调用 update()
+            turtle.ontimer(self.update, self.delta_t)
+
+    def gen_random_params(self):
+        """"""
+        width, height = self.width, self.height
+        # 将 R 设置为 50 至窗口短边一半长度的随机整数
+        R = random.randint(50, min(width, height) // 2)
+        r = random.randint(10, 9 * R // 10)
+        l = random.uniform(.1, .9)
+
+        # 在屏幕边界内随机选择 x 和 y 坐标，选择屏幕上的一个随机点作为螺线的中心。
+        xc = random.randint(-width // 3, width // 3)
+        yc = random.randint(-height // 3, height // 3)
+
+        # 设置为红、绿和蓝颜色的成分，为曲线指定随机的颜色。
+        col = (random.random(), random.random(), random.random())
+        return (xc, yc, col, R, r, l)
+
+    def restart(self):
+        for spiro in self.spiros:
+            spiro.clear()
+            r_params = self.gen_random_params()
+
+            spiro.set_params(*r_params)
+            spiro.restart()
+
+    def update(self):
+        """它由定时器调用，以动画的形式更新所有的 Spiro 对象"""
+        # 使用一个计数器 n_complete 来记录已画的 Spiro 对象的数目
+        n_complete = 0
+        for spiro in self.spiros:
+            spiro.update()
+            if spiro.drawing_complete:
+                n_complete += 1
+        if n_complete == len(self.spiros):
+            # 检查计数器，看看是否所有对象都已画完。如果已画完，调
+            # 用 restart()方法重新开始新的螺线动画。
+            self.restart()
+        # 调用计时器方法，
+        # 它在 delta_t 毫秒后再次调用 update()
+        turtle.ontimer(self.update, self.delta_t)
+
+    def toggle_turtles(self):
+        """打开或关闭海龟光标。这可以让绘图更快。"""
+        for spiro in self.spiros:
+            if spiro.t.isvisible():
+                spiro.t.hideturtle()
+            else:
+                self.t.showturtle()
+
+
+def save_drawing():
+    # 隐藏海龟光标，这样就不会在最后的图形中看到它
+    turtle.hideturtle()
+    # 利用当前时间和日期（以“日—月—年—时—分—秒”的格式），以生成图像文件的唯一名称
+    data_str = (datetime.now()).strftime("%d%b%Y-%H%M%S")
+    # 生成文件名
+    file_name = "spiro-" + data_str
+    print("Saving Drawing to %s.eps/png" % file_name)
+
+    # 利用 tkinter的 canvas 对象，将窗口保存为嵌入式 PostScript（EPS）文件格式。由于 EPS 是矢
+    # 量格式，你可以用高分辨率打印它
+    canvas = turtle.getcanvas()
+    canvas.postscript(file=file_name + '.eps')
+
+    # PNG 用途更广，所以用 Pillow 打开
+    # EPS 文件，并在行将它保存为 PNG 文件
+    img = Image.open(file_name + '.eps')
+    img.save(file_name + ".png", "png")
+    # 取消隐藏海龟光标
+    turtle.showturtle()
+
+
+def main():
+    print("Generating spirograph...")
+    desc_str = """This program draws spirographs using the Turtle module
+    When run with no arguments, this program draws random spirographs
+    
+    Terminology:
+    
+    R: radius of outer circle
+    r: radius of inner circle
+    l: ratio of hole distance to r
+    """
+    parser = argparse.ArgumentParser(description=desc_str)
+    parser.add_argument("--s_params", nargs=3, dest="s_params", required=False,
+                        help="The three arguments in s_params: R, r, l.")
+
+    args = parser.parse_args()
+    # 用 setup() 将绘图窗口的宽度设置为 80％的屏幕宽度
+    # 设置光标形状为海龟
+    turtle.setup(width=.8)
+    turtle.shape("turtle")
+    # 设置程序窗口的标题为 Spirographs
+    turtle.title("Spirographs")
+    # 利用 onkey()和 saveDrawing，在按下 S 时保存图画
+    turtle.onkey(save_drawing, 's')
+    # 调用 listen()让窗口监听用户事件
+    turtle.listen()
+    turtle.hideturtle()
+
+    if args.s_params:
+        # 检查是否有参数赋给 --s_params
+        params = [float(x) for x in args.s_params]
+        col = (.0, .0, .0)
+        spiro = Spiro(0, 0, col, *params)
+        spiro.draw()
+    else:
+        spiro_anim = SpiroAnimator(4)
+        # 利用 onkey() 来捕捉按键 T，这样就可以用它来切换海龟光标（toggleTurtles）
+        turtle.onkey(spiro_anim.toggle_turtles, 't')
+        # 处理空格键（space），这样就可以用它在任何时候重新启动动画
+        turtle.onkey(spiro_anim.restart, "space")
+
+    turtle.mainloop()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,1 @@
+python spiro.py --s_params 100 51 1.47
