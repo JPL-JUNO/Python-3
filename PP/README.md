@@ -5,3 +5,4 @@
 ## 相关链接
 
 1. [关于科赫雪花](https://electronut.in/koch-snowflake-and-the-thue-morse-sequence/)
+2. [灰度等级和网格](https://paulbourke.net/dataformats/asciiart/)
