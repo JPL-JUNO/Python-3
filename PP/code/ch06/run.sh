@@ -1,0 +1,1 @@
+python ascii.py --file data/b.jpg --cols 100 --more_level
