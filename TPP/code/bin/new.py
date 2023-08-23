@@ -71,7 +71,7 @@ def main() -> None:
     program = args.program
 
     if os.path.isfile(program) and not args.overwrite:
-        answer = input(f'{program} exists. Overwrite ? [yN]')
+        answer = input(f'{program} exists. Overwrite ? [y or N]: ')
         if not answer.lower().startswith('y'):
             sys.exit('Will not overwrite. Bey!')
 
@@ -102,9 +102,9 @@ def body(args: Args) -> str:
     today = str(date.today())
     return f"""#!/usr/bin/env python3
 \"\"\"
-Author : {args.name}{' <' + args.email + '>' if args.email else ''}
-Date   : {today}
-Purpose: {args.purpose}
+@Author : {args.name}{' <' + args.email + '>' if args.email else ''}
+@Date   : {today}
+@Purpose: {args.purpose}
 \"\"\"
 
 import argparse
