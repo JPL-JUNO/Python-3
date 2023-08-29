@@ -14,3 +14,4 @@ MP-2nd/.vscode/settings.json
 *.synctex.gz
 BP-3rd/code/ch13/ABBREV.txt
 *.db
+*.mypy_cache
