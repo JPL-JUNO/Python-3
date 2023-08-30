@@ -1,13 +1,16 @@
 """
-@Title: 运行一些测试代码
+@Title: 运行测试代码
 @Author(s): Stephen CUI
 @LastEditor(s): Stephen CUI
 @CreatedTime: 2023-08-30 17:03:46
 @Description: 
 """
 
-from knn import Sample, LabeledSample, TrainData
-data = raw_data = [
+from data import DataLoader
+from knn import KNNClassifier
+from sample import Sample
+
+raw_data = [
     {"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4,
         "petal_width": 0.2, "label": "Iris-setosa"},
     {"sepal_length": 5.0, "sepal_width": 3.5, "petal_length": 1.4,
@@ -29,6 +32,10 @@ data = raw_data = [
 ]
 
 
-td = TrainData()
-td.load(data)
-print(td.training)
+dl = DataLoader()
+dl.load(raw_data)
+
+model = KNNClassifier()
+model.fit(dl.training)
+X_prediction = Sample(5.0, 3.5, 1.4, 0.2)
+prediction = model.predict(X_prediction)

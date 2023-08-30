@@ -5,7 +5,7 @@
 @CreatedTime: 2023-08-30 15:54:21
 @Description: 
 """
-from knn import Sample
+from sample import Sample
 
 
 class Distance:
