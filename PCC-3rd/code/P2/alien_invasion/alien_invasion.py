@@ -10,7 +10,7 @@ import sys
 import pygame
 
 # 可以统一修改参数设置
-from setting import Setting
+from settings import Settings
 from ship import Ship
 
 
@@ -22,7 +22,7 @@ class AlienInvasion:
 
         pygame.init()
 
-        self.settings = Setting()
+        self.settings = Settings()
 
         # create a display window
         # self.screen = pygame.display.set_mode((1200, 800))
@@ -48,13 +48,10 @@ class AlienInvasion:
             # for event in pygame.event.get():
             #     if event.type == pygame.QUIT:
             #         sys.exit()
-
             # 更新飞船的位置
             # 不是循环，一次也只移动一个 pixel
             self.ship.update()
-
             self._update_screen()
-
             self.clock.tick(60)
 
     def _check_events(self):
@@ -65,7 +62,6 @@ class AlienInvasion:
             elif event.type == pygame.KEYDOWN:
                 # 第二次重构，调用检查键盘按下的操作
                 self._check_keydown_events(event)
-
             elif event.type == pygame.KEYUP:
                 # 第二次重构，调用检查键盘抬起的操作
                 self._check_keyup_events(event)
@@ -75,7 +71,6 @@ class AlienInvasion:
         if event.key == pygame.K_RIGHT:
             # make the ship to the right
             # self.ship.rect.x += 1
-
             self.ship.moving_right = True
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = True

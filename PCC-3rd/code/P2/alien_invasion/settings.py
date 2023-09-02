@@ -7,7 +7,7 @@
 """
 
 
-class Setting:
+class Settings:
     def __init__(self,):
         """初始化游戏的设置"""
         self.screen_width = 1200
