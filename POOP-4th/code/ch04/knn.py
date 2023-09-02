@@ -38,16 +38,21 @@ class KNNClassifier:
         self.k = k
         self._model_params = {'k': self.k, 'p': self.p}
         self.fit_flg = False
+        self.training: list[LabeledSample] = []
+        self.testing: list[LabeledSample] = []
 
     # def fit(self, X, y) -> None:
     #     pass
 
-    def fit(self, training_data: list[LabeledSample]) -> None:
+    def fit(self,
+            training_data: list[LabeledSample],
+            testing_data: list[LabeledSample]) -> None:
         if not training_data:
             raise RuntimeError("数据或特征为空")
         # assert len(training_X) == len(training_y), "特征与标签的长度不同"
         self.fit_flg = True
         self.training = training_data
+        self.testing = testing_data
 
     def predict(self, predict_data: Sample):
         if not self.fit_flg:
@@ -81,6 +86,7 @@ class KNNClassifier:
                 raise KeyError("模型没有该参数")
             else:
                 self.__dict__[key] = value
+        self._model_params = {'k': self.k, 'p': self.p}
 
 
 if __name__ == '__main__':
