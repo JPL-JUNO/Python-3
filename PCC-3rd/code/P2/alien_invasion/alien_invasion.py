@@ -29,6 +29,13 @@ class AlienInvasion:
         # 在设置中统一使用参数
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height))
+        # 修改为全屏
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        # 修改设置中的宽和高
+        # 确保在可以使用 Q 退出的，全屏下是没有关闭窗口的
+        self.settings.screen_height = self.screen.get_rect().height
+        self.settings.screen_width = self.screen.get_rect().width
+
         self.clock = pygame.time.Clock()
 
         # set the background color
