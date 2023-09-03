@@ -13,6 +13,7 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 
 class AlienInvasion:
@@ -49,6 +50,11 @@ class AlienInvasion:
         # 用于管理（有效）子弹
         self.bullets = pygame.sprite.Group()
 
+        # 外星人组
+        self.aliens = pygame.sprite.Group()
+        # 创建舰队
+        self._create_fleet()
+
     def run_game(self):
         while True:
             """Start the main loop for the game"""
@@ -63,7 +69,7 @@ class AlienInvasion:
             self.ship.update()
             # 更新子弹
             self._update_bullets()
-
+            self._update_alien()
             self._update_screen()
             self.clock.tick(60)
 
@@ -131,8 +137,62 @@ class AlienInvasion:
         # draw the ship on the screen by calling ship.blitme
         self.ship.blitme()
 
+        # When you call draw() on a group, Pygame draws each element in the
+        # group at the position defined by its rect attribute. The draw() method
+        # requires one argument: a surface on which to draw the elements from the
+        # group.
+        self.aliens.draw(self.screen)
+
         # Make the most recently drawn screen visible
         pygame.display.flip()
+
+    def _create_fleet(self):
+        """Create the fleet of aliens"""
+        # make an alien
+        # Create an alien and keep adding aliens until there's no room left.
+        # Spacing between aliens is one alien width and one alien height.
+        alien = Alien(self)
+        # self.aliens.add(alien)
+        # alien_width = alien.rect.width
+        alien_width, alien_height = alien.rect.size
+        current_x, current_y = alien_width, alien_height
+        # current_x = alien_width
+        while current_y < (self.settings.screen_height - 2 * alien_height):
+            while current_x < (self.settings.screen_width - 2 * alien_width):
+                self._create_alien(current_x, current_y)
+                current_x += 2 * alien_width
+            # finished a row; reset x value, and increment y value
+            current_x = alien_width
+            current_y += 2 * alien_height
+
+    def _create_alien(self, x_position, y_position):
+        """create an alien and place it in the row"""
+        new_alien = Alien(self)
+        new_alien.x = x_position
+        new_alien.rect.x = x_position
+        new_alien.rect.y = y_position
+        self.aliens.add(new_alien)
+
+    def _update_alien(self):
+        """update the positions of all aliens in the feet"""
+        # Check if the fleet is at an edge, then update positions.
+        self._check_fleet_edges()
+        self.aliens.update()
+
+    def _check_fleet_edges(self):
+        """如果有任何一个外星人到达边缘，舰队改变方向"""
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """舰队下降并且改变运动方向"""
+        # 舰队整体下降
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        # 舰队方向改变
+        self.settings.fleet_direction *= -1
 
 
 if __name__ == "__main__":
