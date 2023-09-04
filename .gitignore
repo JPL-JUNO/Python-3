@@ -15,3 +15,4 @@ MP-2nd/.vscode/settings.json
 BP-3rd/code/ch13/ABBREV.txt
 *.db
 *.mypy_cache
+BP-3rd/code/ch18/py2exe_example
