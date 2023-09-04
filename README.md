@@ -16,3 +16,16 @@ Read notes for Python book
 <a href="https://www.packtpub.com/product/learn-python-programming-third-edition/9781801815093"><img src="https://content.packt.com/B17579/cover_image_small.jpg" width=100px></a>
 
 <a href="https://www.ituring.com.cn/book/2118"><img src="https://file.ituring.com.cn/LargeCover/180164640f01dff0ce25" width=100px></a> -->
+
+## 下载链接
+
+[Jython](https://www.jython.org/download)
+[SWIG](https://www.swig.org/download.html)
+
+## 安装命令
+
+``$ java -jar jython-installer-2.7.3.jar``
+
+Windows
+
+SWIG直接解压，然后将该文件夹添加至环境变量
