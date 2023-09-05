@@ -29,3 +29,7 @@ Read notes for Python book
 Windows
 
 SWIG直接解压，然后将该文件夹添加至环境变量
+
+## 其他资源
+
+[游戏图片](https://opengameart.org)

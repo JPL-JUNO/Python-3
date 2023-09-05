@@ -3,3 +3,5 @@ beautifulsoup4
 clr
 setuptools
 py2exe
+pygame
+image
