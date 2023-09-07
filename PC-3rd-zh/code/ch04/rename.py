@@ -9,5 +9,5 @@ import os
 import sys
 sys.path.append("./")
 
-for folder in os.listdir("../ch01"):
+for folder in os.listdir("./"):
     os.rename(folder, folder.replace(" ", "_").lower())
