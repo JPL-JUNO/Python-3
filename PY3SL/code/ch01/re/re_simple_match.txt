@@ -1,0 +1,3 @@
+Found 'this'
+in 'Does this text match the pattern?'
+from 5 to 9 ('this')
