@@ -38,3 +38,23 @@ As a special case of a character set, the meta-character dot, or period (.), ind
     \end{tabular}
 
 \end{table}
+\subsubsection{锚定}
+使用锚定指令指定模式在输入文本中的相对位置。
+\begin{table}
+    \centering
+    \caption{正则表达式锚定码}
+    \label{tbl1-2}
+    \begin{tabular}{ll}
+        \hline
+        锚定码      & 含义       \\
+        \hline
+        $\hat{}$ & 字符串或行的开头 \\
+        \$       & 字符串或行末尾  \\
+        \\A       & 字符串开头        \\
+        \\Z       & 字符串末尾        \\
+        \\b       & 单词开头或末尾的空串   \\
+        \\B       & 不在单词开头或末尾的空串 \\
+        \hline
+    \end{tabular}
+
+\end{table}

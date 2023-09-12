@@ -1,0 +1,18 @@
+This is some text -- with punctuation
+
+'^(\w+)' (word at start of string)
+
+  ('This',)
+
+'(\w+)\S*$' (word at end, with optional punctuation)
+
+  ('punctuation',)
+
+'(\bt\w+)\W+(\w+)' (word starting with t, another word)
+
+  ('text', 'with')
+
+'(\w+t)\b' (word ending with t)
+
+  ('text',)
+

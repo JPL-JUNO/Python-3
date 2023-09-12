@@ -11,7 +11,7 @@ from re_test_patterns import test_patterns
 test_patterns(
     "This is some text -- with punctuation",
     [
-        (r"^\w+", "word at start of string, excluding alphanumeric"),
+        (r"^\w+", "word at start of string"),
         (r"\A\w+", "word at start of sting"),
         (r"\w+\S*$", "word near end of string"),
         (r"\w+\S*\Z", "word near end of string"),
