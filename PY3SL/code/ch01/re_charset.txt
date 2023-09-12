@@ -1,0 +1,24 @@
+'[ab]' (either a or b)
+
+  'abbaabbba'
+  'a'
+  .'b'
+  ..'b'
+  ...'a'
+  ....'a'
+  .....'b'
+  ......'b'
+  .......'b'
+  ........'a'
+
+'a[ab]+' (a followed by 1 or more a or b)
+
+  'abbaabbba'
+  'abbaabbba'
+
+'a[ab]+?' (a followed by 1 or more a or b, not greedy)
+
+  'abbaabbba'
+  'ab'
+  ...'aa'
+
