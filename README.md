@@ -36,3 +36,7 @@ SWIG直接解压，然后将该文件夹添加至环境变量
 [游戏图片](https://opengameart.org)
 
 [Predicted Sunspot Number And Radio Flux Values](https://www.swpc.noaa.gov/products/predicted-sunspot-number-and-radio-flux)
+
+<details><summary><b>Fluent Python, 2nd</b></summary>
+![](Covers/FluentPython2nd.jfif)
+</details>
