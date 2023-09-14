@@ -29,3 +29,12 @@ class Friend(Contact):
         # allowing us to call the parent method directly
         super().__init__(name, email)
         self.phone = phone
+
+
+class AddressHolder:
+    def __init__(self, street: str, city: str, state: str,
+                 code: str) -> None:
+        self.street = street
+        self.city = city
+        self.state = state
+        self.code = code
