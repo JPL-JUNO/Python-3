@@ -10,3 +10,7 @@ The multiprocessing module provides a low-level interface to process- and thread
     \item[ctypes]允许在进程派生（forked）后，在父子进程间共享原生数据类型（例如，整型数、浮点数和字节数）。
     \item[同步原语]锁和信号量在进程间同步控制流。
 \end{description}
+
+\section{使用多进程和多线程来估算 $\pi$}
+\subsection{Using numpy}
+The main reason that numpy is faster than pure Python when solving the same problem is that numpy is creating and manipulating the same object types at a very low level in contiguous blocks of RAM, rather than creating many higher-level Python objects that each require individual management and addressing.

@@ -9,7 +9,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-speeds = [[374.11],
+speeds = [[61.15],
           [374.11, 77.28, 79.74, 62.89],
           [62.05, 37.22, 25.91, 21.57]]
 nbr_cores = [[1],
@@ -23,7 +23,7 @@ for nc, sp, label, mk in zip(nbr_cores, speeds, labels, markers):
     plt.plot(nc, sp, mk, label=label, linewidth=2)
 
 plt.annotate("Serial and Threads have similar execution time",
-             xy=(nbr_cores[0][0] + .2, speeds[0][0] + 10))
+             xy=(nbr_cores[0][0] + .2, speeds[1][0] + 10))
 plt.xlim(.5, 8.5)
 plt.ylim(0, 400)
 plt.ylabel("Execution time (seconds) - smaller is better")

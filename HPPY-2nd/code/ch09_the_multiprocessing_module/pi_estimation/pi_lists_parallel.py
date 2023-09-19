@@ -16,7 +16,7 @@ import time
 def estimate_nbr_points_in_quarter_circle(nbr_estimates):
     """"""
     print(
-        f"Executing estimate_nbr_points_in_quarter_circle"
+        f"Executing estimate_nbr_points_in_quarter_circle "
         f"with {nbr_estimates:,} on pid {os.getpid()}")
     nbr_trails_in_quarter_unit_circle = 0.0
     for _ in range(int(nbr_estimates)):
