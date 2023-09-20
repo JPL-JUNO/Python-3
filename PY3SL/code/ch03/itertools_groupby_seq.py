@@ -23,6 +23,7 @@ class Point:
 
     def __eq__(self, other):
         return (self.x, self.y) == (other.x, other.y)
+    # 要实现比较功能
 
     def __gt__(self, other):
         return (self.x, self.y) >= (other.x, other.y)
