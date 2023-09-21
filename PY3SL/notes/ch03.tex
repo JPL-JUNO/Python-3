@@ -1,4 +1,23 @@
 \chapter{算法}
+Python 包含很多模块，可以采用最适合任务的方式来精巧而简洁地实现方式。它支持不同的编程方式，包括纯过程式、面向对象式和函数式。这 3 中方式经常在同一个程序中不同部分混合使用。
+
+functools 包含的函数用你与创建函数修饰符、启用面向方面（aspect-oriented）编程以及传统面向对象方法不能支持的代码重用。它还提供一个类修饰符以使用一个快捷方式来实现所有富比较 API，另外提供了 partial 对象来创建函数（包含其参数）的引用。
+
+itertools 模块包含的函数用于创建和处理函数式编程中使用的迭代器和生成器。通过提供基于函数的内置操作接口（如算术操作和元素查找）。
+
+operator 模块在使用函数式编程时不在需要很多麻烦的 lambda 函数。
+
+不论使用哪一种编程方式， contextlib 都会让资源管理更容易、更可靠且更简洁。结合上下文管理器和 with 语句，可以减少 try:finally 块的个数和所需的缩进层次，同时还能确保文件、套接字、数据库事务和其他资源在适当的时候关闭和释放。
+\section{functools: 管理函数的工具}
+\subsection{缓存}
+The \verb|lru_cache()| decorator wraps a function in a “least recently used” cache. Arguments to the function are used to build a hash key, which is then mapped to the result. Subsequent calls with the same arguments will fetch the value from the cache instead of calling the function. The decorator also adds methods to the function to examine the state of the cache (\verb|cache_info()|) and empty the cache (\verb|cache_clear()|).
+\subsection{归约数据集}
+The reduce() function takes a callable and a sequence of data as input. It produces a single value as output based on invoking the callable with the values from the sequence and accumulating the resulting output.
+
+\subsection{泛型函数}
+在类似 Python 的动态类型语言中，通常需要基于参数的类型完成稍有不同的操作，特别是在处理元素列表与单个元素的差别时。直接检查参数的类型固然很简单，但是有些情况下，行为差异可能需要被隔离到单个的函数中，对于这些情况，functools 提供了 singledispatch() 修饰符来注册一组泛型函数（generic function），可以根据函数第一个参数的类型自动切换。
+
+
 \section{itertools: 迭代器函数}
 itertools 包括一组用于处理序列数据集的函数。
 \subsection{合并和分解迭代器}
@@ -53,3 +72,6 @@ Programming using iterators occasionally requires creating small functions for s
 \subsection{算术操作符}
 \subsection{序列操作符}
 The operators for working with sequences can be organized into four groups: building up sequences, searching for items, accessing contents, and removing items from sequences.
+\subsection{就地操作符}
+\subsection{属性和元素 “获取方法”}
+\subsection{结合操作符和定制类}
