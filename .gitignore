@@ -12,3 +12,13 @@ FP-2nd/Codes/Ch02/floats-1M-lines.txt
 MP-2nd/.vscode/settings.json
 *.vscode
 *.synctex.gz
+BP-3rd/code/ch13/ABBREV.txt
+*.db
+*.mypy_cache
+BP-3rd/code/ch18/py2exe_example
+*.idea
+PY3SL/code/ch14/logging_rotation_file_example.out.1
+PY3SL/code/ch14/logging_rotation_file_example.out.2
+PY3SL/code/ch14/logging_rotation_file_example.out.3
+PY3SL/code/ch14/logging_rotation_file_example.out.4
+PY3SL/code/ch14/logging_rotation_file_example.out.5

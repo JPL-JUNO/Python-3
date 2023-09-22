@@ -1,0 +1,267 @@
+\begin{table}
+    \caption{列表与元组函数}
+    \begin{tabularx}{\textwidth}{lXl}
+        \hline
+        函数名    & 说明           & 返回值  \\
+        \hline
+        append & 将一个对象附加到列表末尾 & None \\
+        clear  & 就地清空列表内容     &      \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+
+\begin{table}
+    \caption{字符串格式设置中的类型说明符}
+    \label{StringFormatTypeDescription}
+    \begin{tabularx}{\textwidth}{lX}
+        \hline
+        类型 & 含义                                               \\
+        \hline
+        b  & 将整数表示为二进制数                                       \\
+        c  & 将整数解读为Unicode码点                                  \\
+        d  & 将整数视为十进制数进行处理，这是整数默认使用的说明符                       \\
+        e  & 使用科学表示法来表示小数（用e来表示指数）                            \\
+        E  & 与e相同，但使用E来表示指数                                   \\
+        f  & 将小数表示为定点数                                        \\
+        F  & 与f相同，但对于特殊值（nan和inf），使用大写表示                      \\
+        g  & 自动在定点表示法和科学表示法之间做出选择。这是默认用于小数的说明符，但在默认情况下至少有1位小数 \\
+        G  & 与g相同，但使用大写来表示指数和特殊值                              \\
+        n  & 与g相同，但插入随区域而异的数字分隔符                              \\
+        o  & 将整数表示为八进制数                                       \\
+        s  & 保持字符串的格式不变，这是默认用于字符串的说明符                         \\
+        x  & 将整数表示为十六进制数并使用小写字母                               \\
+        X  & 与x相同，但使用大写字母                                     \\
+        \% & 将数表示为百分比值（乘以100，按说明符f设置格式，再在后面加上\%）              \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\begin{table}
+    \caption{字典的方法汇总}
+    \begin{tabularx}{\textwidth}{lX}
+        \hline
+        方法         & 描述                                                                \\
+        \hline
+        clear      & 方法clear删除所有的字典项，这种操作是就地执行的，因此什么都不返回（或者说返回None）。                   \\
+        copy       & 返回一个新字典，其包含的键-值对与原来的字典相同（这个方法执行的是浅复制，因为值本身是原件，而非副本）。              \\
+        fromkeys   & 创建一个新字典，其中包含指定的键，且每个键对应的值都是None（默认）。如果你不想使用默认值None，可提供特定的值。       \\
+        get        & 获取字典对应键的值，不存在的键也不会报错，而是返回None                                     \\
+        items      & 返回一个包含所有字典项的列表，其中每个元素都为(key, value)的形式。                           \\
+        keys       & 返回一个字典视图，其中包含指定字典中的键。                                             \\
+        values     & 返回一个由字典中的值组成的字典视图。                                                \\
+        pop        & 获取与指定键相关联的值，并将该键-值对从字典中删除。                                        \\
+        popitem    & 随机地弹出一个字典项，并返回弹出的键值对                                              \\
+        setdefault & 点像get，因为它也获取与指定键相关联的值，但除此之外，setdefault还在字典不包含指定的键时，在字典中添加指定的键-值对。 \\
+        update     & 使用一个字典中的项来更新另一个字典。                                                \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+
+\begin{table}
+    \caption{Python比较运算符}
+    \label{python comparison operator}
+    \begin{tabularx}{\textwidth}{1X}
+        \hline
+        表 达 式             & 描 述            \\
+        \hline
+        \verb|x == y|     & x 等于y          \\
+        \verb|x < y|      & x小于y           \\
+        \verb|x > y|      & x大于y           \\
+        \verb|x >= y|     & x大于或等于y        \\
+        \verb|x <= y|     & x小于或等于y        \\
+        \verb|x != y|     & x不等于y          \\
+        \verb|x is y|     & x和y是同一个对象      \\
+        \verb|x is not y| & x和y是不同的对象      \\
+        \verb|x in y|     & x是容器（如序列）y的成员  \\
+        \verb|x not in y| & x不是容器（如序列）y的成员 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{一些内置的异常类}
+    \label{builtinexceptionclasses}
+    \begin{tabularx}{ll}
+        \hline
+        类 名               & 描 述                              \\
+        \hline
+        Exception         & 几乎所有的异常类都是从它派生而来的                \\
+        AttributeError    & 引用属性或给它赋值失败时引发                   \\
+        OSError           & 操作系统不能执行指定的任务（如打开文件）时引发，有多个子类    \\
+        IndexError        & 使用序列中不存在的索引时引发，为LookupError的子类   \\
+        KeyError          & 使用映射中不存在的键时引发，为LookupError的子类    \\
+        NameError         & 找不到名称（变量）时引发                     \\
+        SyntaxError       & 代码不正确时引发                         \\
+        TypeError         & 将内置操作或函数用于类型不正确的对象时引发            \\
+        ValueError        & 将内置操作或函数用于这样的对象时引发：其类型正确但包含的值不合适 \\
+        ZeroDivisionError & 在除法或求模运算的第二个参数为零时引发              \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{lX}
+        \hline
+        函 数                                                          & 描 述    \\
+        \hline
+        \verb|warnings.filterwarnings(action,category=Warning, ...)| & 用于过滤警告 \\
+        \verb|warnings.warn(message, category=None)|                 & 用于发出警告 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+
+\begin{table}
+    \centering
+    \caption{一种简单的包布局}
+    \label{packageLayout}
+    \begin{tabular}{ll}
+        \hline
+        \hline
+        文件/目录                               & 描 述            \\
+        \verb|~/python/|                    & PYTHONPATH中的目录 \\
+        \verb|~/python/drawing/|            & 包目录（包drawing）  \\
+        \verb|~/python/drawing/__init__.py| & 包代码（模块drawing） \\
+        \verb|~/python/drawing/colors.py|   & 模块colors       \\
+        \verb|~/python/drawing/shapes.py|   & 模块shapes       \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{模块sys中一些重要的函数和变量}
+    \label{sys}
+    \begin{tabular}{ll}
+        \hline
+        函数/变量       & 描 述                      \\
+        \hline
+        argv        & 命令行参数，包括脚本名              \\
+        exit([arg]) & 退出当前程序，可通过可选参数指定返回值或错误消息 \\
+        modules     & 一个字典，将模块名映射到加载的模块        \\
+        path        & 一个列表，包含要在其中查找模块的目录的名称    \\
+        platform    & 一个平台标识符，如sunos5或win32    \\
+        stdin       & 标准输入流——一个类似于文件的对象        \\
+        stdout      & 标准输出流——一个类似于文件的对象        \\
+        stderr      & 标准错误流——一个类似于文件的对象        \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{模块os中一些重要的函数和变量}
+    \label{os}
+    \begin{tabular}{ll}
+        \hline
+        函数/变量           & 描 述                                         \\
+        \hline
+        environ         & 包含环境变量的映射                                   \\
+        system(command) & 在子shell中执行操作系统命令                            \\
+        sep             & 路径中使用的分隔符                                   \\
+        pathsep         & 分隔不同路径的分隔符                                  \\
+        linesep         & 行分隔符（\verb|'\n'|、\verb|'\r'|或\verb|'\r\n'|） \\
+        urandom(n)      & 返回n个字节的强加密随机数据                              \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{模块fileinput中一些重要的函数和变量}
+    \label{fileinput}
+    \begin{tabular}{ll}
+        \hline
+        函数                                  & 描 述                 \\
+        \hline
+        input([files[, inplace[, backup]]]) & 帮助迭代多个输入流中的行        \\
+        filename()                          & 返回当前文件的名称           \\
+        lineno()                            & 返回（累计的）当前行号         \\
+        filelineno()                        & 返回在当前文件中的行号         \\
+        isfirstline()                       & 检查当前行是否是文件中的第一行     \\
+        isstdin()                           & 检查最后一行是否来自sys.stdin \\
+        nextfile()                          & 关闭当前文件并移到下一个文件      \\
+        close()关闭序列                                               \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{模块heapq中一些重要的函数和变量}
+    \label{heapq}
+    \begin{tabular}{ll}
+        \hline
+        函数                   & 描 述             \\
+        \hline
+        heappush(heap, x)    & 将x压入堆中          \\
+        heappop(heap)        & 从堆中弹出最小的元素      \\
+        heapify(heap)        & 让列表具备堆特征        \\
+        heapreplace(heap, x) & 弹出最小的元素，并将x压入堆中 \\
+        nlargest(n, iter)    & 返回iter中n个最大的元素  \\
+        nsmallest(n, iter)   & 返回iter中n个最小的元素  \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{Python日期元组中的字段}
+    \label{timePython}
+    \begin{tabular}{lll}
+        \hline
+        索 引 & 字 段 & 值              \\
+        \hline
+        0   & 年   & 如2000、2001等    \\
+        1   & 月   & 范围1~12         \\
+        2   & 日   & 范围1~31         \\
+        3   & 时   & 范围0~23         \\
+        4   & 分   & 范围0~59         \\
+        5   & 秒   & 范围0~61         \\
+        6   & 星期  & 范围0~6，其中0表示星期一 \\
+        7   & 儒略日 & 范围1~366        \\
+        8   & 夏令时 & 0、1或-1         \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{模块time中一些重要的函数和变量}
+    \label{time}
+    \begin{tabular}{lll}
+        \hline
+        函 数                        & 描 述                     \\
+        \hline
+        asctime([tuple])           & 将时间元组转换为字符串             \\
+        localtime([secs])          & 将秒数转换为表示当地时间的日期元组       \\
+        mktime(tuple)              & 将时间元组转换为当地时间            \\
+        sleep(secs)                & 休眠（什么都不做）secs秒          \\
+        strptime(string[, format]) & 将字符串转换为时间元组             \\
+        time()                     & 当前时间（从新纪元开始后的秒数，以UTC为准） \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{模块random中一些重要的函数和变量}
+    \label{random}
+    \begin{tabular}{lll}
+        \hline
+        函 数                              & 描 述                                \\
+        \hline
+        random()                         & 返回一个0~1（含）的随机实数                    \\
+        getrandbits(n)                   & 以长整数方式返回n个随机的二进制位                  \\
+        uniform(a, b)                    & 返回一个a~b（含）的随机实数                    \\
+        randrange([start], stop, [step]) & 从range(start, stop, step)中随机地选择一个数 \\
+        choice(seq)                      & 从序列seq中随机地选择一个元素                   \\
+        shuffle(seq[, random])           & 就地打乱序列seq                          \\
+        sample(seq, n)                   & 从序列seq中随机地选择n个值不同的元素               \\
+        \hline
+    \end{tabular}
+\end{table}

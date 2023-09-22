@@ -1,0 +1,530 @@
+\chapter{条件、循环及其他语句\label{chapter05}}
+\section{再谈print和import}
+虽然print现在实际上是一个函数，但以前却是一种语句，因此在这里进行讨论。
+\warning{
+    对很多应用程序来说，使用模块logging来写入日志比使用print更合适，详情请参阅\autoref{chapter19}。
+}
+\subsection{打印多个参数}
+实际上，你可同时打印多个表达式，条件是用逗号分隔它们。参数之间会插入一个空格字符。在你要合并文本和变量值，而又不想使用字符串格式设置功能时，这种行为很有帮助。
+\begin{pyc}
+print('Age:', 42)  # Age: 42
+
+name = "Gumby"
+salutation = "Mr."
+greeting = 'Hello,'
+print(greeting, salutation, name)  # Hello, Mr. Gumby
+\end{pyc}
+如果需要，可自定义分隔符，还可自定义结束字符串，以替换默认的换行符。
+\begin{pyc}
+print('I', "wish", 'to', 'register', 'a', 'complaint', sep='_')
+# I_wish_to_register_a_complaint
+
+print('Hello, ', end='')
+print('World!')
+# Hello, World!
+\end{pyc}
+\subsection{导入时重命名}
+模块导入时，通常使用：
+\begin{pyc}
+import some_module
+from some_module import some_function
+from some_module import some_function, another_function, yet_another_function
+from some_module import * 
+\end{pyc}
+仅当你确定要导入模块中的一切时，采用使用最后一种方式。但如果有两个模块，它们都包含函数\verb|same_function|，该如何办呢？你可使用第1行的代码导入这两个模块，并像下面这样调用函数：
+\begin{pyc}
+module1.same_function
+module2.same_function
+\end{pyc}
+
+还有一种办法：在语句末尾添加as子句并指定别名
+\begin{pyc}
+import math as foobar
+foobar.sqrt(4)  # 2.0
+\end{pyc}
+下面是一个导入特定函数并给它指定别名的例子：
+\begin{pyc}
+from math import sqrt as foobar
+foobar.sqrt(4)  # 2.0
+\end{pyc}
+对于前面的函数open，可像下面这样导入它们：
+\begin{pyc}
+from module1 import some_function as some_function1
+from module2 import some_function as some_function2
+\end{pyc}
+\warning{
+    有些模块（如os.path）组成了层次结构（一个模块位于另一个模块中）。
+}
+\section{赋值魔法}
+\subsection{序列解包}
+可同时（并行）给多个变量赋值\verb|x, y, z = 1, 2, 3|，使用这种方式还可交换多个变量的值。
+\begin{pyc}
+x, y = y, x
+x, y, z  # (2, 1, 3)
+\end{pyc}
+这里执行的操作称为\textbf{序列解包}（或\textbf{可迭代对象解包}）：\important{将一个序列（或任何可迭代对象）解包，并将得到的值存储到一系列变量中}。这在使用返回元组（或其他序列或可迭代对象）的函数或方法时很有用。这让函数能够返回被打包成元组的多个值，然后通过一条赋值语句轻松地访问这些值。
+\begin{pyc}
+scoundrel = {'name': 'Robin', 'girlfriend': 'Marion'}
+key, value = scoundrel.popitem()
+key, value  # ('girlfriend', 'Marion')
+\end{pyc}
+
+要解包的序列包含的元素个数必须与你在等号左边列出的目标个数相同，否则Python将引发异常。
+\begin{pyc}
+x, y, z = 1, 2
+# not enough values to unpack (expected 3, got 2)
+x, y, z = 1, 2, 3, 4  # too many values to unpack (expected 3)
+\end{pyc}
+如果获取的值和变量无法保证相同数量，可使用星号运算符（\verb|*|）来收集多余的值，带星号的变量放在任意位置。
+\begin{pyc}
+a, b, *rest = [1, 2, 3, 4]
+rest  # [3, 4]
+head, *rest, tail = [1, 2, 3, 4]
+rest  # [2, 3]
+*head, a, b = [1, 2, 3, 4]
+head  # [1, 2]
+\end{pyc}
+赋值语句的右边可以是任何类型的序列，但\notes{带星号的变量最终包含的总是一个列表}。在变量和值的个数相同时亦如此。这种收集方式也可用于函数参数列表中（参见\autoref{chapter06}）。
+\subsection{链式赋值}
+链式赋值是一种快捷方式，用于将多个变量关联到同一个值，\verb|x = y = somefunction|，与下面的代码等价：
+\begin{pyc}
+y = somefunction()
+x = y
+\end{pyc}
+但是，请注意，这两条语句可能与下面的语句不等价：
+\begin{pyc}
+y = somefunction()
+x = somefunction()
+\end{pyc}
+\subsection{增强赋值}
+可以不编写代码\verb|x = x + 1|，而将右边表达式中的运算符（这里是+）移到赋值运算符（=）的前面，从而写成\verb|x += 1|。这称为增强赋值，适用于所有标准运算符，如*、/、\%等。
+
+增强赋值也可用于其他数据类型（只要使用的双目运算符可用于这些数据类型）。通过使用增强赋值，可让代码更紧凑、更简洁，同时在很多情况下的可读性更强。
+\section{代码块}
+代码块其实并不是一种语句，代码块是一组语句，可在满足条件时执行（if语句），可执行多次（循环），等等。代码块是通过缩进代码（即在前面加空格）来创建的。
+\warning{
+    也可使用制表符来缩进代码块。Python将制表符解释为移到下一个制表位（相邻制表位相距8个空格），但标准（也是更佳的）做法是只使用空格（而不使用制表符）来缩进，且每级缩进4个空格。
+}
+
+在Python中，使用冒号（:）指出接下来是一个代码块，并将该代码块中的每行代码都缩进相同的程度。发现缩进量与之前相同时，你就知道当前代码块到此结束了。
+\section{条件和条件语句}
+\subsection{这正是布尔值的用武之地}
+真值也称布尔值，是以在真值方面做出了巨大贡献的George Boole命名的。
+
+用作布尔表达式（如用作if语句中的条件）时，下面的值都将被解释器视为假：
+
+\verb|False None 0 "" () [] {}|
+
+换而言之，标准值False和None、各种类型（包括浮点数、复数等）的数值0、空序列（如空字符串、空元组和空列表）以及空映射（如空字典）都被视为假，而其他各种值都被视为真\footnote{ 至少对内置类型值来说如此。对于自己创建的对象，解释为真还是假由你决定。}，包括特殊值True。
+
+鉴于任何值都可用作布尔值，因此你几乎不需要显式地进行转换（Python会自动转换）。
+\warning{
+    虽然[]和``"都为假（即bool([]) == bool(``") == False），但它们并不相等（即[] != ``"）。对其他各种为假的对象来说，情况亦如此（一个更显而易见的例子是() != False）。
+}
+\subsection{有条件地执行和 if 语句}
+if语句，让你能够有条件地执行代码。这意味着如果条件（if和冒号之间的表达式）为前面定义的真，就执行后续代码块；如果条件为假，就不执行。
+\begin{pyc}
+name = input('What is your name? ')
+if name.endswith('Gumby'):
+    print('Hello, Mr. Gumby')
+\end{pyc}
+\subsection{else子句}
+如果想要在if语句的条件为假时执行另一个代码段，可以使用else子句（之所以叫子句是因为else不是独立的语句，而是if语句的一部分）。
+\begin{pyc}
+name = input('What is your name? ')7
+if name.endswith('Gumby'):
+    print('Hello, Mr. Gumby')
+else:
+    print('Hello, stranger')
+\end{pyc}
+
+还有一个与if语句很像的“亲戚”，它就是条件表达式——C语言中三目运算符的Python版本。
+
+\verb|status = 'friend' if name.endswith('Gumby') else 'stranger'|
+
+如果条件（紧跟在if后面）为真，表达式的结果为提供的第一个值（if之前），否则为第二个值（else之后）。
+\subsection{elif 子句}
+要检查多个条件，可使用elif。elif是else if的缩写，由一个if子句和一个else子句组合而成，也就是包含条件的else子句。
+\begin{pyc}
+num = int(input("Enter a number: "))
+if num > 0:
+    print('The number is positive')
+elif num < 0:
+    print('The number is negative')
+else:
+    print('The number is zero')
+\end{pyc}
+
+\subsection{代码块嵌套}
+你可将if语句放在其他if语句块中，如下所示：
+\begin{pyc}
+name = input('What is your name?')
+if name.endswith('Gumby'):
+    if name.startswith('Mr.'):
+        print('Hello, Mr. Gumby')
+    elif name.startswith('Mrs.'):
+        print("Hello, Mrs. Gumby")
+    else:
+        print("Hello, Gumby")
+else:
+    print('Hello, stranger')
+\end{pyc}
+\subsection{更复杂的条件}
+下面来说说条件本身，因为它们是有条件执行中最有趣的部分。
+\subsubsection{比较运算符}
+在条件表达式中，最基本的运算符可能是比较运算符，它们用于执行比较。\autoref{python comparison operator}对比较运算符做了总结。
+
+\begin{table}
+    \caption{Python比较运算符}
+    \label{python comparison operator}
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        表 达 式             & 描 述            \\
+        \hline
+        \verb|x == y|     & x 等于y          \\
+        \verb|x < y|      & x小于y           \\
+        \verb|x > y|      & x大于y           \\
+        \verb|x >= y|     & x大于或等于y        \\
+        \verb|x <= y|     & x小于或等于y        \\
+        \verb|x != y|     & x不等于y          \\
+        \verb|x is y|     & x和y是同一个对象      \\
+        \verb|x is not y| & x和y是不同的对象      \\
+        \verb|x in y|     & x是容器（如序列）y的成员  \\
+        \verb|x not in y| & x不是容器（如序列）y的成员 \\
+        \hline
+    \end{tabular}
+\end{table}
+与赋值一样，Python也支持链式比较：可同时使用多个比较运算符，如\verb|0 < age < 100|。
+
+有些比较运算符需要特别注意，下面就来详细介绍：
+\begin{itemize}
+    \item 相等运算符（==），个等号是赋值运算符，用于修改值。
+    \item is：相同运算符，这个运算符很有趣，其作用看似与==一样，但实际上并非如此。
+    \begin{pyc}
+x = y = [1, 2, 3]
+z = [1, 2, 3]
+x == y, x == z, x is y, x is z  # (True, True, True, False)
+    \end{pyc}
+    is检查两个对象是否\textbf{相同}（\textbf{而不是相等}）。变量x和y指向同一个列表，而z指向另一个列表（其中包含的值以及这些值的排列顺序都与前一个列表相同）。这两个列表虽然相等，但并非同一个对象。（\important{个人理解，is运算符比较的是内存地址是否相同，即是不是同一个对象，但是==比较的是值是否相同}）
+
+    \notes{
+        总之，==用来检查两个对象是否相等，而is用来检查两个对象是否相同（是同一个对象）。
+    }
+    \warning{
+        \important{不要将is用于数和字符串等不可变的基本值}。鉴于Python在内部处理这些对象的方式，这样做的结果是不可预测的。
+    }
+    \item in：成员资格运算符，与其他比较运算符一样，它也可用于条件表达式中。
+    \begin{pyc}
+name = input('What is your name?')
+if 's' in name:
+    print('Your name contains the letter "s".')
+else:
+    print("Your name does not contain the letter 's'.")
+    \end{pyc}
+    \item 字符串和序列的比较：\tips{字符串是根据字符的字母排列顺序进行比较的}，\verb|"alpha" < "beta"  # True|。虽然基于的是字母排列顺序，但字母都是Unicode字符，它们是按码点排列的。\tips{字符是根据顺序值排列的}。要获悉字母的顺序值，可使用函数ord。这个函数的作用与函数chr相反。
+    \begin{pyc}
+ord('a')  # 97
+chr(155)  # '\x9b'
+    \end{pyc}
+    其他序列的比较方式与此相同，但这些序列包含的元素可能不是字符，而是其他类型的值。如果序列的元素为其他序列，将根据同样的规则对这些元素进行比较。
+    \begin{pyc}
+[1, 2] < [2, 1]  # True
+[1, [5, 6]] < [1, [5, 7]]  # True
+[1, 2, [5, 6]] < [1, [5, 7]]
+# '<' not supported between instances of 'int' and 'list'
+    \end{pyc}
+\end{itemize}
+\subsubsection{布尔运算符}
+运算符and是一个布尔运算符。它接受两个真值，并在这两个值都为真时返回真，否则返回假。还有另外两个布尔运算符：or和not。通过使用这三个运算符，能以任何方式组合真值。
+
+\explain{短路逻辑和条件表达式}{
+    布尔运算符有个有趣的特征：只做必要的计算。例如，仅当x和y都为真时，表达式x and y才为真。因此如果x为假，这个表达式将立即返回假，而不关心y。实际上，如果x为假，这个表达式将返回x，否则返回y。这种行为称为短路逻辑（或者延迟求值）：布尔运算符常被称为逻辑运算符，如你所见，在有些情况下将“绕过”第二个值。对于运算符or，情况亦如此。在表达式x or y中，如果x为真，就返回x，否则返回y。请注意，这意味着位于布尔运算符后面的代码（如函数调用）可能根本不会执行。
+}
+\subsection{断言}
+你可要求某些条件得到满足（如核实函数参数满足要求或为初始测试和调试提供帮助），为此可在语句中使用关键字\verb|assert|。问题是，为何要编写类似于这样的代码呢？因为让程序在错误条件出现时立即崩溃胜过以后再崩溃。
+\begin{pyc}
+age = 10
+assert 0 < age < 100
+age = -1
+assert 0 < age < 100  # AssertionError:
+\end{pyc}
+如果知道必须满足特定条件，程序才能正确地运行，可在程序中添加assert语句充当检查点，这很有帮助。还可在条件后面添加一个字符串，对断言做出说明。
+\begin{pyc}
+age = -1
+assert 0 < age < 100, "The age must be realistic"
+# AssertionError: The age must be realistic
+\end{pyc}
+\section{循环\label{section5.5}}
+\subsection{while循环}
+\begin{pyc}
+    name = ''
+    while not name.strip():
+        name = input('Please enter your name: ')
+    print('Hello, {}!'.format(name))
+\end{pyc}
+\subsection{for循环}
+while语句非常灵活，可用于在条件为真时反复执行代码块。这在通常情况下很好，但有时候你可能想根据需要进行定制。一种这样的需求是为序列（或其他可迭代对象）中每个元素执行代码块。
+\warning{
+    基本上，可迭代对象是可使用for循环进行遍历的对象。
+}
+\begin{pyc}
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+for number in numbers:
+    print(number)
+\end{pyc}
+鉴于迭代（也就是遍历）特定范围内的数是一种常见的任务，Python提供了一个创建范围的内置函数range，包含起始位置，但不包含结束位置）。如果只提供了一个位置，将把这个位置视为结束位置，并假定起始位置为0。
+
+\begin{pyc}
+range(0, 10)
+range(10)  # range(0, 10)
+\end{pyc}
+\warning{
+    只要能够使用for循环，就不要使用while循环。
+}
+\subsubsection{迭代字典}
+要遍历字典的所有关键字，可像遍历序列那样使用普通的for语句。
+\begin{pyc}
+d = {'x': 1, 'y': 2, 'z': 3}
+for key in d:
+    print(key, 'correspond to', d[key])
+\end{pyc}
+也可使用keys等字典方法来获取所有的键。如果只对值感兴趣，可使用d.values。你可能还
+记得，d.items以元组的方式返回键-值对。\notes{for循环的优点之一是，可在其中使用序列解包}。
+\begin{pyc}
+for key, value in d.items():
+print(key, 'correspond to', value)
+\end{pyc}
+\warning{
+    字典元素的排列顺序是不确定的。换而言之，\important{迭代字典的键或值时，一定会处理所有的键或值，但不知道处理的顺序}。如果顺序很重要，可将键或值存储在一个列表中并对列表排序，再进行迭代。要让映射记住其项的插入顺序，可使用模块collections中的OrderedDict类。
+}
+\subsubsection{一些迭代工具}
+\paragraph{并行迭代} 一个很有用的并行迭代工具是内置函数\verb|zip|，它将两个序列“缝合”起来，并返回一个由元组组成的序列。返回值是一个适合迭代的对象，要查看其内容，可使用list将其转换为列表。“缝合”后，可在循环中将元组解包。
+\begin{pyc}
+names = ['anne', 'beth', 'george', 'damon']
+ages = [12, 45, 32, 102]
+list(zip(names, ages))
+# [('anne', 12), ('beth', 45), ('george', 32), ('damon', 102)]
+for name, age in zip(names, ages):
+    print(name, 'is', age, 'years old.')
+\end{pyc}
+函数zip可用于“缝合”任意数量的序列。需要指出的是，当序列的长度不同时，函数zip将
+在最短的序列用完后停止“缝合”。
+\begin{pyc}
+list(zip(range(5), range(1000)))
+# [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)]
+\end{pyc}
+
+\paragraph{迭代时获取索引} 在有些情况下，你需要在迭代对象序列的同时获取当前对象的索引，可以使用内置函数\verb|enumerate|，这个函数让你能够迭代索引值对，其中的索引是自动提供的。
+\begin{pyc}
+for index, string in enumerate(strings):
+if 'xxx' in string:
+    string[index] = '[censored]'
+\end{pyc}
+\paragraph{反向迭代和排序后再迭代} 来看另外两个很有用的函数：reversed和sorted。它们类似于列表方法reverse和sort（sorted 接受的参数也与sort类似），但可用于任何序列或可迭代的对象，且不就地修改对象，而是返回反转和排序后的版本。
+\begin{pyc}
+sorted([4, 3, 6, 7, 3])  # [3, 3, 4, 6, 7]
+sorted('Hello, world!')
+# [' ', '!', ',', 'H', 'd', 'e', 'l', 'l', 'l', 'o', 'o', 'r', 'w']
+
+list(reversed('Hello, world!'))
+''.join(reversed('Hello, world!'))  # '!dlrow ,olleH'
+\end{pyc}
+\notes{请注意，sorted返回一个列表，而reversed像zip那样返回一个更神秘的可迭代对象。}
+
+\tips{要按字母表排序，可先转换为小写。为此，可将sort或sorted的key参数设置为str.lower。例如，sorted(``aBc", key=str.lower)返回['a', 'B', 'c']。}
+
+\subsubsection{跳出循环}
+在有些情况下，你可能想中断循环、开始新迭代（进入“下一轮”代码块执行流程）或直接结束循环。
+\paragraph{break} 要结束（跳出）循环，可使用break，循环直接中断（停止）。
+\begin{py}{找出小于100的最大平方值}
+for n in range(99, 0, -1):
+root = sqrt(n)
+if root == int(root):
+    print(n)
+    break
+\end{py}
+\paragraph{continue} 它结束当前迭代，并跳到下一次迭代开头。这基本上意味着跳过循环体中余下的语句，但不结束循环。
+\paragraph{while True/break成例} 例如，假设你要在用户根据提示输入单词时执行某种操作，并在用户没有提供单词时结束循环。为此，一种办法如下：
+\begin{pyc}
+word = 'dummy'
+while word:
+    word = input('Please enter a word:')
+    print('The word was', wor
+\end{pyc}
+为进入循环，你需要将一个哑值（未用的值）赋给word。像这样的哑值通常昭示着你的做法不太对。下面来尝试消除这个哑值：
+\begin{pyc}
+word = input('Please enter a word: ')
+while word:
+    print("The word was ", word)
+    word = input('Please enter a word: ')
+\end{pyc}
+
+哑值消除了，但包含重复的代码（这样也不好）：需要在两个地方使用相同的赋值语句并调用input。第二种方法要比第一种好，会少输出最后一行，但是这两种方法都谈不上代码的优雅性。
+
+因此介绍使用成例\verb|while True/break|。
+\begin{pyc}
+while True:
+word = input('Please enter a word: ')
+if not word:
+    break
+print('The word is ', word)
+\end{pyc}
+while True导致循环永不结束，但你将条件放在了循环体内的一条if语句中，而这条if语句将在条件满足时调用break。\notes{但这似乎每次都需要进行判断，即执行第3行的代码，尚未测试对性能的影响}。
+
+\subsubsection{循环中的 else 子句} 
+要在循环提前结束时采取某种措施很容易，但有时候你可能想在循环正常结束时才采取某种措施。可以在\important{循环中添加一条else子句，它仅在没有调用break时才执行，即循环正常结束}。
+\begin{pyc}
+from math import sqrt
+for n in range(99, 81, -1):
+    root = sqrt(n)
+    if root == int(root):
+        print(n)
+        break
+else:
+    print("Didn't find!")
+\end{pyc}
+\section{简单推导}
+列表推导是一种从其他列表创建列表的方式，类似于数学中的集合推导。
+
+\verb|[x * x for x in range(10)]  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]|\\
+也可以在列表推导中使用for循环以及if语句。
+
+\begin{pyc}
+girls = ['alice', 'bernice', 'clarice', 'beta']
+boys = ['chris', 'arnold', 'bob', 'alpha']
+[b+'+'+g for b in boys for g in girls if b[0] == g[0]]
+\end{pyc}
+这些代码将名字的首字母相同的男孩和女孩配对。
+
+\begin{tcolorbox}[title=优雅的配对代码, breakable]
+名称配对问题使用Python解决方法有很多，下面是Alex Martelli推荐的解决方案：
+\begin{pyc}
+letterGirls = {}
+for girl in girls:
+    letterGirls.setdefault(girl[0], []).append(girl)
+[b+'+'+g for b in boys for g in letterGirls[b[0]]]
+\end{pyc}
+
+这个程序创建一个名为letterGirls的字典，其中每项的键都是一个字母(见字典方法\nameref{setdefault})，而值为以这个字母打头的女孩名字组成的列表。创建这个字典后，列表推导遍历所有的男孩，并查找名字首字母与当前男孩相同的所有女孩。这样，这个列表推导就无需尝试所有的男孩和女孩组合并检查他们的名字首字母是否相同了。
+\end{tcolorbox}
+
+使用圆括号代替方括号并不能实现元组推导，而是将创建\textbf{生成器}，详细信息请参阅\autoref{chapter09}的旁注“简单生成器”。然而，可使用花括号来执行\textbf{字典推导}。
+
+\begin{pyc}
+squares = {i: "{} squared is {}".format(i, i * i) for i in range(10)}
+squares[8]  # '8 squared is 64'
+\end{pyc}
+
+在列表推导中，for前面只有一个表达式，而在字典推导中，for前面有两个用冒号分隔的表达式。这两个表达式分别为键及其对应的值。
+\section{三人行}
+结束本章前，大致介绍一下另外三条语句：pass、del和exec。
+\subsection{pass}
+有时候什么都不用做。这种情况不多，但一旦遇到，知道可使用pass语句大有裨益。那么为何需要一条什么都不做的语句呢？在你编写代码时，可将其用作占位符。例如，你可能编写了一条if语句并想尝试运行它，但其中缺少一个代码块，如下所示：
+\begin{pyc}
+if name == 'Stephen CUI':
+    print('Welcome!')
+elif name == 'Enid':
+    # to do
+elif name == 'Bill Gates':
+    print('Access denied!')
+\end{pyc}
+这些代码不能运行，因为在Python中代码块不能为空。要修复这个问题，只需在中间的代码块中添加一条pass语句即可。
+\begin{pyc}
+if name == 'Stephen CUI':
+    print('Welcome!')
+elif name == 'Enid':
+    pass
+elif name == 'Bill Gates':
+    print('Access denied!')
+\end{pyc}
+\begin{tcolorbox}[title=注意]
+    也可不使用注释和pass语句，而是插入一个字符串。这种做法尤其适用于未完成的函数和类，因为这种字符串将充当文档字符串。
+\end{tcolorbox}
+\subsection{使用 del 删除}
+对于你不再使用的对象，Python通常会将其删除（因为没有任何变量或数据结构成员指向它）。
+\begin{pyc}
+scoundrel = {'age': 42, 'first name': 'Robin', 'last name': 'of Locksley'}
+robin = scoundrel
+scoundrel  # {'age': 42, 'first name': 'Robin', 'last name': 'of Locksley'}
+robin  # {'age': 42, 'first name': 'Robin', 'last name': 'of Locksley'}
+scoundrel = None
+robin  # {'age': 42, 'first name': 'Robin', 'last name': 'of Locksley'}
+\end{pyc}
+最初，robin和scoundrel指向同一个字典，因此将None赋给scoundrel后，依然可以通过robin来访问这个字典。但将robin也设置为None之后，这个字典就漂浮在计算机内存中，没有任何名称与之相关联，再也无法获取或使用它了。因此，智慧无穷的Python解释器直接将其删除。这被称为\textbf{垃圾收集}。请注意，在前面的代码中，也可将其他任何值（而不是None）赋给两个变量，这样字典也将消失。
+
+另一种办法是使用del语句。这不仅会删除到对象的引用，还会删除名称本身。
+\begin{pyc}
+x = 1
+del x
+x  # NameError: name 'x' is not defined
+\end{pyc}
+这看似简单，但有时不太好理解。例如：
+\begin{pyc}
+x = ['Hello', 'World']
+y = x
+y[1] = 'Python'
+del x
+y  # ['Hello', 'Python']
+\end{pyc}
+x和y指向同一个列表，但删除x对y没有任何影响，因为你只删除名称x，而没有删除列表本身（值）。\important{事实上，在Python中，根本就没有办法删除值，而且你也不需要这样做，因为对于你不再使用的值，Python解释器会立即将其删除}。
+\subsection{使用 exec 和 eval 执行字符串及计算其结果}
+有时候，你可能想动态地编写Python代码，并将其作为语句进行执行或作为表达式进行计算。这可能犹如黑暗魔法，一定要小心。
+\begin{tcolorbox}[title=警告]
+    本节介绍如何执行存储在字符串中的Python代码，这样做可能带来严重的安全隐患。如果将部分内容由用户提供的字符串作为代码执行，将无法控制代码的行为。在网络应用程序，如\autoref{chapter15}将介绍的通用网关接口（CGI）脚本中，这样做尤其危险。
+\end{tcolorbox}
+\paragraph{exec} 函数exec将字符串作为代码执行
+
+\verb|exec("print('Hello, World')")  # Hello, World|
+
+然而，调用函数exec时只给它提供一个参数绝非好事。在大多数情况下，还应向它传递一个\textbf{命名空间}------用于放置变量的地方；否则代码将污染你的命名空间，即修改你的变量。
+\begin{pyc}
+from math import sqrt
+exec("sqrt = 1")
+sqrt(4)  # TypeError: 'int' object is not callable
+\end{pyc}
+函数exec主要用于动态地创建代码字符串。如果这种字符串来自其他地方（可能是用户），就几乎无法确定它将包含什么内容。因此为了安全起见，要提供一个字典以充当命名空间。为此，你添加第二个参数——字典，用作代码字符串的命名空间\footnote{实际上，可向exec提供两个命名空间：一个全局的和一个局部的。提供的全局命名空间必须是字典，而提供的局部命名空间可以是任何映射。这一点也适用于eval。}。
+\begin{pyc}
+from math import sqrt
+scope = {}
+exec('sqrt = 1', scope)
+sqrt(4)  # 2
+scope['sqrt']  # 1
+\end{pyc}
+请注意，如果你尝试将scope打印出来，将发现它包含很多内容，这是因为自动在其中添加
+了包含所有内置函数和值的字典\verb|__builtins__|。
+\paragraph{eval} exec执行一系列Python语句，而eval计算用字符串表示的Python表达式的值，并返回结果（exec什么都不返回，因为它本身是条语句）。
+
+\verb|eval(input('Enter an arithmetic expression: '))|
+\begin{tcolorbox}
+虽然表达式通常不会给变量重新赋值，但绝对能够这样做，如调用给全局变量重新赋值的函数。因此，将eval用于不可信任的代码并不比使用exec安全。当前，在Python中执行不可信任的代码时，没有安全的办法。一种替代解决方案是使用Jython等Python实现，以使用Java沙箱等原生机制。
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=浅谈作用域, breakable]
+向exec或eval提供命名空间时，可在使用这个命名空间前在其中添加一些值。
+\begin{pyc}
+    scope = {}
+    scope['x'] = 2
+    scope['y'] = 3
+    eval('x * y', scope)  # 6
+\end{pyc}
+同样，同一个命名空间可用于多次调用exec或eval。
+\begin{pyc}
+scope = {}
+exec('x = 2', scope)
+eval('x * x', scope)  # 4
+\end{pyc}
+采用这种做法可编写出非常复杂的程序，但你也许不应这样做。
+\end{tcolorbox}
+\section{小结}
+\begin{dinglist}{43}
+    \item 打印语句：你可使用print语句来打印多个用逗号分隔的值。如果print语句以逗号结尾，后续print语句将在当前行接着打印。
+    \item 导入语句：有时候，你不喜欢要导入的函数的名称——可能是因为你已将这个名称用作他用。在这种情况下，可使用\verb|import ... as ...|语句在本地重命名函数。
+    \item 赋值语句：通过使用奇妙的序列解包和链式赋值，可同时给多个变量赋值；而通过使用增强赋值，可就地修改变量。
+    \item 代码块：代码块用于通过缩进将语句编组。
+    \item 条件语句：条件语句根据条件（布尔表达式）决定是否执行后续代码块。通过使用if/elif/else，可将多个条件语句组合起来。条件语句的一个变种是条件表达式，如\verb|a if b else c|。
+    \item 断言：断言断定某件事（一个布尔表达式）为真，可包含说明为何必须如此的字符串。如果指定的表达式为假，断言将导致程序停止执行，最好尽早将错误揪出来，免得它潜藏在程序中，直到带来麻烦。
+    \item 循环：你可针对序列中的每个元素（如特定范围内的每个数）执行代码块，也可在条件为真时反复执行代码块。要跳过代码块中余下的代码，直接进入下一次迭代，可使用continue语句；要跳出循环，可使用break语句。另外，你还可在循环末尾添加一个else子句，它将在没有执行循环中的任何break语句时执行。
+    \item 推导：推导并不是语句，而是表达式。它们看起来很像循环，推导功能强大，但在很多情况下，使用普通循环和条件语句也可完成任务，且代码的可读性可能更高。使用类似于列表推导的表达式可创建出字典。
+    \item pass、del、exec和eval：pass语句什么都不做，但适合用作占位符。del语句用于删除变量或数据结构的成员，但不能用于删除值。函数exec用于将字符串作为Python程序执行。函数eval计算用字符串表示的表达式并返回结果。
+\end{dinglist}

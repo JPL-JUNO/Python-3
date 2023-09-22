@@ -1,0 +1,16 @@
+\documentclass{article}
+\include{../../preamble}
+\title{新东西}
+\author{Stephen CUI}
+\begin{document}
+\section{itertools}
+\begin{itemize}
+    \item islice: 允许对一个无穷生成器进行切片
+    \item chain: 将多个生成器链接到一起
+    \item takewhile: 给生成器添加一个终止条件
+    \item cycle: 通过不断重复将一个有穷生成器变成无穷
+    \item groupby
+\end{itemize}
+\subsection{groupby}
+这个函数的输入参数是一组数据和一个用于分组的关键字函数。返回的则是一个生成器，生成的每一个值都是一个元组，元组内包含该组的关键字和该组所有元素的生成器。
+\end{document}

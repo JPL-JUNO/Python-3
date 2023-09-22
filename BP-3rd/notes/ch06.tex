@@ -1,0 +1,515 @@
+\chapter{抽象\label{chapter06}}
+本章介绍如何将语句组合成函数，这让你能够告诉计算机如何完成任务，且只需说一次，无需反复向计算机传达详细指令。
+\section{懒惰是一种美德}
+这里说的懒不是贬义词，而是说不做无谓的工作。抽象的方式是告诉计算机去做某件事，但是具体怎么做不需要指定，指定做的时候去调用就可以。
+
+\section{抽象和结构}
+抽象可节省人力，但实际上还有个更重要的优点：抽象是程序能够被人理解的关键所在（无论对编写程序还是阅读程序来说，这都至关重要）。计算机本身喜欢具体而明确的指令，但人通常不是这样的。
+
+\begin{pyc}
+page = download_page()
+freqs = compute_frequencies(page)
+for word, freq in freqs:
+    print(word, freq)
+\end{pyc}
+看到这些代码，任何人都知道这个程序是做什么的。然而，至于具体该如何做，你未置一词。你只是让计算机去下载网页并计算使用频率，至于这些操作的具体细节，将在其他地方（独立的\textbf{函数定义}）中给出。
+
+\section{自定义函数}
+函数执行特定的操作并返回一个值\footnote{实际上，在Python中并非所有的函数都返回值，没有返回值的为None}，你可以调用它（调用时可能需要提供一些参数------放在圆括号中的内容）。一般而言，要判断某个对象是否可调用，可使用内置函数\verb|callable|。
+
+\begin{pyc}
+import math
+x = 1
+y = math.sqrt
+callable(x)  # False
+callable(y)  # True
+\end{pyc}
+
+函数是结构化编程的核心，函数的定义通过def（表示定义函数）定义语句。
+\begin{pyc}
+def hello(name):
+    return 'Hello, ' + name + '!'
+\end{pyc}
+运行这些代码后，将有一个名为hello的新函数。它返回一个字符串，其中包含向唯一参数指定的人发出的问候语。你可像使用内置函数那样使用这个函数。
+
+\begin{pyc}
+hello('World')  # 'Hello, World!'
+hello('Gumby')  # 'Hello, Gumby!'
+\end{pyc}
+\subsection{给函数编写文档}
+要给函数编写文档，以确保其他人能够理解，可添加注释（以\#打头的内容）。还有另一种编写注释的方式，就是添加独立的字符串。放在函数开头的字符串称为\textbf{文档字符串}（docstring），将作为函数的一部分存储起来。可以使用\verb|__doc__|访问文档字符串：
+\begin{pyc}
+def square(x):
+    'Calculate the square of the number x'
+    return x * x
+square.__doc__
+# 'Calculate the square of the number x'
+\end{pyc}
+
+\begin{tcolorbox}
+    \verb|__doc__|是函数的一个属性，属性名中的双下划线表示这是一个特殊的属性。
+\end{tcolorbox}
+特殊的内置函数help很有用。在交互式解释器中，可使用它获取有关函数的信息，其中包含函数的文档字符串。
+\begin{pyc}
+help(square)
+# Help on function square in module __main__:
+
+# square(x)
+#     Calculate the square of the number x
+\end{pyc}
+\subsection{其实并不是函数的函数}
+数学意义上的函数总是返回根据参数计算得到的结果。在Python中，有些函数什么都不返回。在诸如Pascal等的语言中，这样的函数可能另有其名（如过程），但在Python中，函数就是函数，即使它严格来说并非函数。什么都不返回的函数不包含return语句，或者包含return语句，但没有在return后面指定值。
+
+\begin{pyc}
+def test():
+    print('This is a demo')
+    return
+    print('This is not')
+x = test()  # This is a demo
+print(x)  # None
+\end{pyc}
+这是一个你熟悉的值：None。由此可知，所有的函数都返回值。如果你没有告诉它们该返回什么，将返回None。
+
+\begin{tcolorbox}
+    不要让这种默认行为带来麻烦。如果你在if之类的语句中返回值，务必确保其他分支也返回值，以免在调用者期望函数返回一个序列时（举个例子），不小心返回了None。
+\end{tcolorbox}
+\section{参数魔法}
+函数使用起来很简单，创建起来也不那么复杂，但要习惯参数的工作原理就不那么容易了。
+\subsection{值从哪里来}
+编写函数旨在为当前程序（甚至其他程序）提供服务，你的职责是\notes{确保它在提供的参数正确时完成任务，并在参数不对时以显而易见的方式失败}。
+\begin{tcolorbox}
+    在def语句中，位于函数名后面的变量通常称为形参，而调用函数时提供的值称为实参，在很重要的情况下，我会将实参称为值，以便将其与类似于变量的形参区分开来，其他情况不区分形参和实参。
+\end{tcolorbox}
+\subsection{我能修改参数吗}
+函数通过参数获得了一系列的值，你能对其进行修改吗？在函数内部给参数赋值对外部没有任何影响。
+\begin{pyc}
+def try_to_change(n):
+    n = 'Mr. Gumby'
+name = 'Mrs. Entity'
+try_to_change(name)
+name  # 'Mrs. Entity'
+\end{pyc}
+
+传递并修改参数的效果类似于下面这样：
+\begin{tcolorbox}[title=传递并修改参数的效果示意]
+    \begin{pyc}
+name = 'Mrs. Entity'
+n = name
+n = 'Mr. Gumby'
+name  # 'Mrs. Entity'
+    \end{pyc}
+\end{tcolorbox}
+变量n变了，但变量name没变。同样，在函数内部重新关联参数（即给它赋值）时，函数外部的变量不受影响。
+
+字符串（以及数和元组）是不可变的（immutable），这意味着你不能修改它们（即只能替换为新值）。因此这些类型作为参数没什么可说的。但如果参数为可变的数据结构（如列表）呢？
+
+\begin{pyc}
+def change(n):
+    n[0] = 'Mr. Gumby'
+names = ['Mes. Entity', 'Mrs. Thing']
+change(names)
+names  # ['Mr. Gumby', 'Mrs. Thing']
+\end{pyc}
+在这个示例中，也在函数内修改了参数，但这个示例与前一个示例之间存在一个重要的不同。在前一个示例中，只是给局部变量赋了新值，而在这个示例中，修改了变量关联到的列表。这很奇怪吧？
+
+\begin{tcolorbox}[title=等效示意]
+    \begin{pyc}
+names = ['Mrs. Entity', 'Mrs. Thing']
+n = names
+n[0] = 'Mr. Gumby'
+names  # ['Mr. Gumby', 'Mrs. Thing']
+    \end{pyc}
+\end{tcolorbox}
+\important{将同一个列表赋给两个变量时，这两个变量将同时指向这个列表}，就这么简单。要避免这样的结果，必须创建列表的副本。\important{对序列执行切片操作时，返回的切片都是副本}。因此，如果你创建覆盖整个列表的切片，得到的将是列表的副本。
+\begin{pyc}
+names = ['Mrs. Entity', 'Mrs. Thing']
+n = names[:]
+n is names  # False
+n == names  # True
+\end{pyc}
+现在n和names包含两个相等但不同的列表。现在如果（像在函数change中那样）修改n，将不会影响names。
+
+\begin{pyc}
+def change(n):
+    n[0] = 'Mr. Gumby'
+names = ['Mrs. Entity', 'Mrs. Thing']
+change(names[:])
+names  # ['Mrs. Entity', 'Mrs. Thing'] 
+\end{pyc}
+注意到参数n包含的是副本，因此原始列表是安全的。
+\paragraph{为何要修改参数} 在提高程序的抽象程度方面，使用函数来修改数据结构（如列表或字典）是一种不错的方式。抽象的关键在于隐藏所有的更新细节，为此可使用函数。
+
+\paragraph{如果参数是不可变的} 在有些语言（如C++、Pascal和Ada）中，经常需要给参数赋值并让这种修改影响函数外部的变量。在Python中，没法直接这样做，只能修改参数对象本身。但如果参数是不可变的（如数）呢？
+
+不好意思，没办法。在这种情况下，应从函数返回所有需要的值（如果需要返回多个值，就以元组的方式返回它们）。
+
+\begin{pyc}
+    def inc(x): return x + 1
+    foo = 10
+    foo = inc(foo)
+    foo  # 11
+    \end{pyc}
+
+如果一定要修改参数，可玩点花样，比如将值放在列表中，如下所示，但更清晰的解决方案是返回修改后的值。
+\begin{pyc}
+def inc(x): x[0] += 1
+foo = [10]
+inc(foo)
+foo  # [11]
+\end{pyc}
+\subsection{关键字参数和默认值}
+前面使用的参数都是位置参数，因为它们的位置至关重要——事实上比名称还重要。本节介绍的技巧让你能够完全忽略位置。要熟悉这种技巧需要一段时间，但随着程序规模的增大，你很快就会发现它很有用。
+
+有时候，参数的排列顺序可能难以记住，尤其是参数很多时。为了简化调用工作，可指定参数的名称。
+\begin{pyc}
+def hello(greeting, name):
+    print('{}, {}!'.format(greeting, name))
+hello('Hello', 'Python')  # Hello, Python!
+\end{pyc}
+像这样使用名称指定的参数称为关键字参数，主要优点是有助于澄清各个参数的作用。这样，
+函数调用不再像下面这样怪异而神秘：
+
+\verb|store('Mr. Brainsample', 10, 20, 13, 5)|
+关键字参数最大的优点在于，可以指定默认值。
+\begin{pyc}
+def hello(greeting='Hello', name='World'):
+    print('{}, {}!'.format(greeting, name))
+\end{pyc}
+像这样给参数指定默认值后，调用函数时可不提供它！可以根据需要，一个参数值也不提供、提供部分参数值或提供全部参数值。
+
+你可结合使用位置参数和关键字参数，但\important{必须先指定所有的位置参数}，否则解释器将不知道它们是哪个参数（即不知道参数对应的位置）。
+\begin{tcolorbox}
+    通常不应结合使用位置参数和关键字参数，除非你知道这样做的后果。一般而言，除非必不可少的参数很少，而带默认值的可选参数很多，否则不应结合使用关键字参数和位置参数。
+\end{tcolorbox}
+\subsection{收集参数}
+有时候，允许用户提供任意数量的参数很有用。
+\begin{pyc}
+def print_params(*params):
+    print(params)
+print_params('Testing')  # ('Testing',)
+\end{pyc}
+参数前面的星号将提供的所有值都放在一个元组中，也就是将这些值收集起来。赋值时带星号的变量收集多余的值。它收集的是列表而不是元组中多余的值，但除此之外，这两种用法很像。
+\begin{pyc}
+def print_params_2(title, *params):
+    print(title)
+    print(params)
+print_params_2('Title', 1, 2, 3)
+# Title
+# (1, 2, 3)
+\end{pyc}
+因此星号意味着收集余下的位置参数。如果没有可供收集的参数，params将是一个空元组。
+
+与赋值时一样，带星号的参数也可放在其他位置（而不是最后），但不同的是，在这种情况下你需要做些额外的工作：\important{使用名称来指定后续参数}。
+\begin{pyc}
+def in_the_middle(x, *y, z):
+    print(x, ',', y, ',', z)
+in_the_middle(1, 2, 3, 4, 6, 7, z=3)  # 1 , (2, 3, 4, 6, 7) , 3
+in_the_middle(1, 2, 3, 4, 5)
+# in_the_middle() missing 1 required keyword-only argument: 'z'
+\end{pyc}
+星号不会收集关键字参数，要收集关键字参数，可使用两个星号，这样得到的是一个字典而不是元组。
+\begin{pyc}
+print_params_2('Hmm...', something=42)
+# print_params_2() got an unexpected keyword argument 'something'
+
+def print_params_3(**params):
+    print(params)
+print_params_3(x=1, y=2, z=3)  # {'x': 1, 'y': 2, 'z': 3}
+\end{pyc}
+
+结合使用这些技术：
+\begin{pyc}
+def print_params_4(x, y, *pos_params, z=1, **key_params):
+    print(x, y, z)
+    print(pos_params)
+    print(key_params)
+print_params_4(1, 2, 7, 11, z=3, foo=5, bar=13)
+# 1 2 3
+# (7, 11)
+# {'foo': 5, 'bar': 13}
+\end{pyc}
+
+\subsection{分配参数}
+前面介绍了如何将参数收集到元组和字典中，但用同样的两个运算符（*和**）也可执行相反的操作。与收集参数相反的操作是什么呢？
+
+\verb|def add(x, y): return x + y|，同时假设还有一个元组，其中包含两个你要相加的数，\verb|params = (1, 2)|，与前面执行的操作差不多是相反的：不是收集参数，而是分配参数。这是通过在调用函数（而不是定义函数）时使用运算符*实现的，\verb|add(*params)|。
+
+这种做法也可用于参数列表的一部分，条件是这部分位于参数列表末尾。通过使用运算符**，可将字典中的值分配给关键字参数。
+\begin{pyc}
+def hello_3(name='CUI', greeting='Hello'):
+    print('{}, {}'.format(greeting, name))
+params = {'name': 'Sir Robin', 'greeting': 'Well met'}
+hello_3(**params)  # Well met, Sir Robin
+\end{pyc}
+如果在定义和调用函数时都使用*或**，将只传递元组或字典，还不如不使用它们，因此，\notes{只有在定义函数（允许可变数量的参数）或调用函数时（拆分字典或序列）使用，星号才能发挥作用}。
+\subsection{练习使用参数}
+首先定义几个函数：
+\begin{pyc}
+def story(**kwds):
+    return 'Once upon a time, there was a '\
+        '{job} called {name}.'.format_map(kwds)
+def power(x, y, *others):
+    if others:
+        print('Received redundant parameters: ', others)
+    return pow(x, y)
+def interval(start, stop=None, step=1):
+    'Imitates range() for step > 0'
+    if stop is None:
+        start, stop = 0, start
+    result = []
+    i = start
+    while i < stop:
+        result.append(i)
+        i += step
+    return result
+\end{pyc}
+调用这些函数：
+\begin{pyc}
+print(story(job='king', name='Gumby'))
+# Once upon a time, there was a king called Gumby.
+print(story(name='Sir Robin', job='brave knight'))
+# Once upon a time, there was a brave knight called Sir Robin.
+params = {'job': 'language', 'name': 'Python'}
+print(story(**params))
+# Once upon a time, there was a language called Python
+del params['job']
+print(story(job='stroke of genius', **params))
+# Once upon a time, there was a stroke of genius called Python.
+power(2, 3)  # 8
+power(3, 2)  # 9
+power(y=3, x=2)  # 8
+params = (5, ) * 2
+power(*params)
+power(3, 3, 'Hello, world!')
+# Received redundant parameters:  ('Hello, world!',)
+# 27
+interval(10)  # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+interval(1, 5)  # [1, 2, 3, 4]
+interval(3, 12, 4)  # [3, 7, 11]
+power(*interval(3, 7))
+# Received redundant parameters:  (5, 6)
+# 81
+\end{pyc}
+
+\section{作用域}
+变量到底是什么呢？可将其视为指向值的名称。因此，执行赋值语句\verb|x = 1|后，名称x指向值1。这几乎与使用字典时一样（字典中的键指向值），只是你使用的是“看不见”的字典。实际上，这种解释已经离真相不远。有一个名为vars的内置函数，它返回这个不可见的字典：
+\begin{pyc}
+x = 1
+scope = vars()
+scope['x']
+scope['x'] += 1
+x  # 2
+\end{pyc}
+\begin{tcolorbox}[title=警告]
+    一般而言，不应修改vars返回的字典，因为根据Python官方文档的说法，这样做的结果是不确定的。换而言之，可能得不到你想要的结果。
+\end{tcolorbox}
+这种“看不见的字典”称为命名空间或作用域。那么有多少个命名空间呢？除全局作用域外，每个函数调用都将创建一个。
+\begin{pyc}
+def foo(): x = 42
+x = 1
+foo()
+x  # 1
+\end{pyc}
+
+在这里，函数foo修改（重新关联）了变量x，但当你最终查看时，它根本没变。这是因为调用foo时创建了一个新的命名空间，供foo中的代码块使用。赋值语句x = 42是在这个内部作用域（局部命名空间）中执行的，不影响外部（全局）作用域内的x。在函数内使用的变量称为局部变量（与之相对的是全局变量）。参数类似于局部变量，因此参数与全局变量同名不会有任何问题。
+
+但如果要在函数中访问全局变量呢？如果只是想读取这种变量的值（不重新关联它），通常不会有任何问题。
+\begin{pyc}
+def combine(parameter): print(parameter + external)
+external = 'berry'
+combine('Shrub')  # Shrubberry
+\end{pyc}
+
+\warning{
+    像这样访问全局变量是众多bug的根源。务必慎用全局变量。
+}
+
+\begin{tcolorbox}[title=遮盖的问题, breakable]
+读取全局变量的值通常不会有问题，但还是存在出现问题的可能性。如果有一个局部变量或参数与你要访问的全局变量同名，就无法直接访问全局变量，因为它被局部变量遮住了。
+
+如果需要，可使用函数globals来访问全局变量。这个函数类似于vars，\tips{返回一个包含全局变量的字典}。（locals返回一个包含局部变量的字典。）例如，在前面的示例中，如果有一个名为parameter的全局变量，就无法在函数combine中访问它，因为有一个与之同名的参数。然而，必要时可使\verb|globals()['parameter']|来访问它。
+
+\begin{pyc}
+def combine(parameter):
+    print(parameter + globals()['parameter'])
+parameter = 'berry'
+combine('Shrub')
+\end{pyc}
+\end{tcolorbox}
+
+重新关联全局变量（使其指向新值）是另一码事。在函数内部给变量赋值时，该变量默认为局部变量，除非你明确地告诉Python它是全局变量。
+\begin{pyc}
+x = 1
+def change_global():
+    global x
+    x += 1
+change_global()
+x  # 2
+\end{pyc}
+
+\begin{tcolorbox}[title=作用域嵌套]
+Python函数可以嵌套，即可将一个函数放在另一个函数内。嵌套通常用处不大，但有一个很突出的用途：使用一个函数来创建另一个函数。这意味着可像下面这样编写函数：
+\begin{pyc}
+def multiplier(factor):
+    def multiplierByFactor(number):
+        return number * factor
+    return multiplierByFactor
+\end{pyc}
+在这里，一个函数位于另一个函数中，且外面的函数返回里面的函数。也就是返回一个函数，而不是调用它。重要的是，返回的函数能够访问其定义所在的作用域。换而言之，它携带着自己所在的环境（和相关的局部变量）！
+
+每当外部函数被调用时，都将重新定义内部的函数，而变量factor的值也可能不同。由于Python的嵌套作用域，可在内部函数中访问这个来自外部局部作用域（multiplier）的变
+量，如下所示：
+\begin{pyc}
+double = multiplier(2)
+double(5)  # 10
+triple = multiplier(3)
+triple(3)  # 9
+multiplier(5)(4)  # 20
+\end{pyc}
+
+像multiplyByFactor这样存储其所在作用域的函数称为闭包。
+
+通常，不能给外部作用域内的变量赋值，但如果一定要这样做，可使用关键字nonlocal。这个关键字的用法与global很像，让你能够给外部作用域（非全局作用域）内的变量赋值。
+\end{tcolorbox}
+\section{递归}
+函数可调用其他函数，但可能让你感到惊讶的是，函数还可调用自己。简单地说，递归意味着引用（这里是调用）自身。下面是一个常见的递归定义：
+
+递归[名词]：参见``递归'';
+
+下面是一个递归式函数定义：
+\begin{pyc}
+def recursion():
+    return recursion()
+\end{pyc}
+这个定义显然什么都没有做。如果你运行它，结果将如何呢？你将发现运行一段时间后，这个程序崩溃了（引发异常）。从理论上说，这个程序将不断运行下去，但每次调用函数时，都将消耗一些内存。因此函数调用次数达到一定的程度（且之前的函数调用未返回）后，将耗尽所有的内存空间，导致程序终止并显示错误消息“超过最大递归深度”。
+
+这个函数中的递归称为无穷递归（就像以while True打头且不包含break和return语句的循环被称为无限循环一样），因为它从理论上说永远不会结束。你想要的是能对你有所帮助的递归函数，这样的递归函数通常包含下面两部分。
+\begin{dinglist}{43}
+    \item \textbf{基线条件}（针对最小的问题）：满足这种条件时函数将直接返回一个值。
+    \item \textbf{递归条件}：包含一个或多个调用，这些调用旨在解决问题的一部分。
+\end{dinglist}
+
+这里的关键是，通过将问题分解为较小的部分，可避免递归没完没了，因为问题终将被分解成基线条件可以解决的最小问题。
+
+前面说过，每次调用函数时，都将为此创建一个新的命名空间。这意味着函数调用自身时，是两个不同的函数［更准确地说，是不同版本（即命名空间不同）的同一个函数］在交流。你可将此视为两个属于相同物种的动物在彼此交流。
+
+\subsection{两个经典案例：阶乘和幂}
+本节探讨两个经典的递归函数。假设你要计算数字n的阶乘，关键在于阶
+乘的数学定义，可表述如下。
+\begin{dinglist}{43}
+    \item 1的阶乘为1。
+    \item 对于大于1的数字n，其阶乘为n  1的阶乘再乘以n
+\end{dinglist}
+\begin{pyc}
+def factorial(n):
+    if n == 1:
+        return 1
+    else:
+        return n * factorial(n - 1)
+\end{pyc}
+
+再来看一个示例。假设你要计算幂，就像内置函数pow和运算符**所做的那样。这是一个非常简单的小型函数，但也可将定义修改成递归式的。
+\begin{dinglist}{43}
+    \item 对于任何数字x，$power(x, 0)$都为1。
+    \item $n>0$时，$power(x, n)$为$power(x, n-1)$与$x$的乘积。
+\end{dinglist}
+\begin{pyc}
+def power(x, n):
+    if n == 0:
+        return 1
+    else:
+        return x * power(x, n - 1)
+power(2, 10)  # 1024
+\end{pyc}
+
+\begin{tcolorbox}
+    如果函数或算法复杂难懂，在实现前用自己的话进行明确的定义将大有裨益。以这种``准编程语言”编写的程序通常称为\textbf{伪代码}。
+\end{tcolorbox}
+
+\subsection{另一个经典案例：二分查找}
+一个常见的问题是：指定的数字是否包含在已排序的序列中？如果包含，在什么位置？
+
+先来回顾一下定义，确保你知道该如何做。
+\begin{dinglist}{43}
+    \item 如果上限和下限相同，就说明它们都指向数字所在的位置，因此将这个数字返回。
+    \item 否则，找出区间的中间位置（上限和下限的平均值），再确定数字在左半部分还是右半部分。然后在继续在数字所在的那部分中查找。
+\end{dinglist}
+
+在这个递归案例中，关键在于元素是经过排序的。（请注意，这种查找算法返回数字应该在的位置。如果这个数字不在序列中，那么这个位置上的自然是另一个数字。）
+
+\begin{pyc}
+def search(sequence, number, lower=0, upper=None):
+    if upper is None:
+        upper = len(sequence) - 1
+    if lower == upper:
+        assert number == sequence[upper]
+        return upper
+    else:
+        middle = (upper + lower) // 2
+        if number > sequence[middle]:
+            return search(sequence, number, middle + 1, upper)
+        else:
+            return search(sequence, number, lower, middle)
+\end{pyc}
+
+下面来看看这是否可行：
+\begin{pyc}
+seq = [34, 67, 8, 123, 4, 100, 95]
+seq.sort()
+search(seq, 34)  # 2
+search(seq, 100)  # 5
+\end{pyc}
+
+然而，为何要如此麻烦呢？首先，你可使用列表方法index来查找。其次，即便你要自己实现这种功能，也可创建一个循环，让它从序列开头开始迭代，直至找到指定的数字。
+
+确实，使用index挺好，但使用简单循环可能效率低下。前面说过，要在100个数字中找到指定的数字，只需问7次；但使用循环时，在最糟的情况下需要问100次。你可能觉得``没什么大不了的”。但如果列表包含100 000 000 000 000 000 000 000 000 000 000 000个元素（对Python列表来说，这样的长度可能不现实），使用循环也将需要问这么多次，情况开始变得“很大”了。然而，如果使用二分查找，只需问117次。
+\begin{tcolorbox}[breakable]
+    实际上，模块bisect提供了标准的二分查找实现。
+\end{tcolorbox}
+
+效率非常高吧\footnote{事实上，在可观察到的宇宙中，包含的粒子数大约为1087个。要找出其中的一个粒子，只需问大约290次！}
+
+\begin{tcolorbox}[title=函数式编程, breakable]
+    至此，你可能习惯了像使用其他对象（字符串、数、序列等）一样使用函数：将其赋给变量，将其作为参数进行传递，以及从函数返回它们。在有些语言（如 scheme 和 Lisp）中，几乎所有的任务都是以这种方式使用函数来完成的。在 Python 中，通常不会如此倚重函数（而是创建自定义对象），但完全可以这样做。
+
+    Python提供了一些有助于进行这种函数式编程的函数：map、filter和reduce。在较新的Python版本中，函数map和filter的用途并不大，应该使用列表推导来替代它们。你可使用map将序列的所有元素传递给函数。
+    \begin{pyc}
+list(map(str, range(10)))
+# ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+[str(i) for i in range(10)]
+    \end{pyc}
+
+    你可使用filter根据布尔函数的返回值来对元素进行过滤。
+    \begin{pyc}
+def func(x):
+    return x.isalnum()
+seq = ['foo', 'bar', 'x41', '***', '?!']
+list(filter(func, seq))  # ['foo', 'bar', 'x41']
+    \end{pyc}
+    
+    就这个示例而言，如果转而使用列表推导，就无需创建前述自定义函数。
+
+    \verb|[x for x in seq if x.isalnum()]|
+
+    实际上，Python提供了一种名为lambda表达式的功能\footnote{lambda来源于希腊字母，在数学中用于表示匿名函数。}，让你能够创建内嵌的简单函数（主要供map、filter和reduce使用）。
+
+    \verb|list(filter(lambda x: x.isalnum(), seq))|
+
+    要使用列表推导来替换函数reduce不那么容易，而这个函数提供的功能即便能用到，也用得不多。\notes{它使用指定的函数将序列的前两个元素合二为一，再将结果与第3个元素合二为一，依此类推，直到处理完整个序列并得到一个结果}。例如，如果你要将序列中的所有数相加，可结合使用reduce和\verb|lambda x, y: x+y|\footnote{实际上，可不使用这个lambda函数，而是导入模块operator中的函数add（这个模块包含对应于每个内置运算符的函数）。与使用自定义函数相比，使用模块operator中的函数总是效率更高。}。
+
+    \begin{pyc}
+numbers = [72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100, 33]
+from functools import reduce
+reduce(lambda x, y: x + y, numbers)  # 1161
+    \end{pyc}
+\end{tcolorbox}
+\section{小结}
+本章介绍了抽象的基本知识以及函数。
+\begin{dinglist}{43}
+    \item 抽象：抽象是隐藏不必要细节的艺术。
+    \item 函数定义：函数是使用def语句定义的。函数由语句块组成，它们从外部接受值（参数），并可能返回一个或多个值（计算结果）。
+    \item 参数：函数通过参数（调用函数时被设置的变量）接收所需的信息。在Python中，参数有两类：位置参数和关键字参数。通过给参数指定默认值，可使其变成可选的。
+    \item 作用域：变量存储在作用域（也叫命名空间）中。在Python中，作用域分两大类：全局作用域(globals)和局部作用域(locals)。作用域可以嵌套(nonlocal)。
+    \item 递归：函数可调用自身，这称为递归。可使用递归完成的任何任务都可使用循环来完成，但有时使用递归函数的可读性更高。
+    \item 函数式编程：Python提供了一些函数式编程工具，其中包括lambda表达式以及函数map、filter和reduce。
+\end{dinglist}

@@ -1,0 +1,617 @@
+\chapter{魔法函数、特性和迭代器\label{chapter09}}
+在Python中，有些名称很特别，开头和结尾都是两个下划线。你在本书前面已经见过一些，如\verb|__future__|。这样的拼写表示名称有特殊意义，因此绝不要在程序中创建这样的名称。在这样的名称中，很大一部分都是魔法（特殊）方法的名称。如果你的对象实现了这些方法，它们将在特定情况下（具体是哪种情况取决于方法的名称）被Python调用，而几乎不需要直接调用。
+
+\section{如果你使用的不是 Python 3}
+在Python 2.2中，Python对象的工作方式有了很大的变化。有一点需要注意：即便你使用的是较新的Python 2版本，有些功能（如特性和函数super）也不适用于旧式类。要让你的类是新式的，要么在模块开头包含赋值语句\verb|__metaclass__ = type|，要么直接或间接地继承内置类object或其他新式类。
+
+\begin{pyc}
+class NewStyle(object):
+    more_code_here
+class OldStyle:
+    more_code_here
+\end{pyc}
+
+\begin{tcolorbox}
+也可在类的作用域内给变量\verb|__metaclass__|赋值，但这样做只设置当前类的元类（metaclass）。元类是其他类所属的类，这是一个非常复杂的主题。
+\end{tcolorbox}
+
+请注意，在Python 3中没有旧式类，因此无需显式地继承object或将\verb|__metaclass__|设置为type。所有的类都将隐式地继承object。如果没有指定超类，将直接继承它，否则将间接地继承它。
+
+\section{构造函数}
+构造函数不同于普通方法的地方在于，将在对象创建后自动调用它们。
+\begin{pyc}
+class FooBar():
+    def __init__(self):
+        self.somevar = 42
+f = FooBar()
+f.somevar  # 42
+\end{pyc}
+如果给构造函数添加几个参数，结果将如何呢？
+\begin{pyc}
+class FooBar():
+    def __init__(self, value=42):
+        self.somevar = value
+f = FooBar("This is constructor argument")
+f.somevar  # 'This is constructor argument'
+\end{pyc}
+
+\begin{tcolorbox}
+Python提供了魔法方法\verb|__del__|，也称作析构函数（destructor）。这个方法在对象被销毁（作为垃圾被收集）前被调用，但鉴于你无法知道准确的调用时间，建议尽可能不要使用\verb|__del__|。
+\end{tcolorbox}
+\subsection{重写普通方法和特殊的构造函数}
+每个类都有一个或多个超类，并从它们那里继承行为。对类B的实例调用方法（或访问其属性）时，如果找不到该方法（或属性），将在其超类A中查找。
+
+\begin{pyc}
+class A:
+    def hello(self):
+        print("Hello, I'm A.")
+class B(A):
+    pass
+a = A()
+b = B()
+a.hello()  # Hello, I'm A.
+b.hello()  # Hello, I'm A.
+\end{pyc}
+由于类B自己没有定义方法hello，因此对其调用方法hello时，打印的是消息"Hello, I'm A."。
+
+要在子类中添加功能，一种基本方式是添加方法。然而，你可能想重写超类的某些方法，以定制继承而来的行为。
+\begin{pyc}
+class B(A):
+    def hello(self):
+        print("Hello, I'm B")
+b.hello()  # Hello, I'm B.
+\end{pyc}
+
+重写是继承机制的一个重要方面，对构造函数来说尤其重要。构造函数用于初始化新建对象的状态，而对大多数子类来说，除超类的初始化代码外，还需要有自己的初始化代码。虽然所有方法的重写机制都相同，但与重写普通方法相比，重写构造函数时更有可能遇到一个特别的问题：重写构造函数时，必须调用超类（继承的类）的构造函数，否则可能无法正确地初始化对象。
+\begin{pyc}
+class Bird:
+    def __init__(self):
+        self.hungry = True
+
+    def eat(self):
+        if self.hungry:
+            print('Aaaah....')
+            self.hungry = False
+        else:
+            print('No, thanks!')
+b = Bird()
+b.eat()  # Aaaah....
+b.eat()  # No, thanks!
+\end{pyc}
+下面来看子类SongBird，它新增了鸣叫功能。
+\begin{pyc}
+class SongBird(Bird):
+    def __init__(self):
+        self.song = 'Squawk!'
+
+    def sing(self):
+        print(self.song)
+sb = SongBird()
+sb.sing()  # Squawk!
+\end{pyc}
+SongBird是Bird的子类，继承了方法eat，但如果你尝试调用它，将发现一个问题。
+
+\verb|sb.eat()  # AttributeError: 'SongBird' object has no attribute 'hungry'|
+
+异常清楚地指出了问题出在什么地方：SongBird没有属性hungry。为何会这样呢？因为在SongBird中重写了构造函数，但新的构造函数没有包含任何初始化属性hungry的代码。要消除这种错误，SongBird的构造函数必须调用其超类（Bird）的构造函数，以确保基本的初始化得以执行。为此，有两种方法：调用未关联的超类构造函数，以及使用函数super。
+
+\subsection{调用未关联的超类构造函数}
+本节介绍的方法主要用于解决历史遗留问题。在较新的Python版本中，显然应使用函数super。下面先给出前一节末尾问题的解决方案。
+
+\begin{pyc}
+class SongBird(Bird):
+    def __init__(self):
+        Bird.__init__(self)
+        self.song = 'Squawk!'
+
+    def sing(self):
+        print(self.song)
+\end{pyc}
+在SongBird类中，只添加了一行，其中包含代码\verb|Bird.__init__(self)|。下面的代码表明这确实有用：
+\begin{pyc}
+sb.eat()  # Aaaah....
+sb.eat()  # No, thanks!
+\end{pyc}
+这样做为何管用呢？对实例调用方法时，方法的参数self将自动关联到实例（称为关联的方法），这样的示例你见过多个。然而，如果你通过类调用方法（如\verb|Bird.__init__|），就没有实例与其相关联。在这种情况下，你可随便设置参数self。这样的方法称为未关联的。通过将这个未关联方法的self参数设置为当前实例，将使用超类的构造函数来初始化SongBird对象。
+\subsection{使用函数 super}
+如果你使用的不是旧版Python，就应使用函数super。\important{调用这个函数时，将当前类和当前实例作为参数。对其返回的对象调用方法时，调用的将是超类（而不是当前类）的方法}。在Python 3中调用函数super时，可不提供任何参数（通常也应该这样做）。
+\begin{pyc}
+class SongBird(Bird):
+    def __init__(self):
+        super().__init__()
+        self.song = 'Squawk!'
+
+    def sing(self):
+        print(self.song)
+\end{pyc}
+\begin{tcolorbox}[title=使用函数super有何优点]
+在我看来，相比于直接对超类调用未关联方法，使用函数super更直观，但这并非其唯一的优点。实际上，函数super很聪明，因此即便有多个超类，也只需调用函数super一次（条件是所有超类的构造函数也使用函数super）。另外，对于使用旧式类时处理起来很棘手的问题（如两个超类从同一个类派生而来），在使用新式类和函数super时将自动得到处理。你无需知道函数super的内部工作原理，但必须知道的是，使用函数super比调用超类的未关联构造函数（或其他方法）要好得多。
+
+函数super返回的到底是什么呢？通常，你无需关心这个问题，只管假定它返回你所需的超类即可。实际上，它返回的是一个super对象，这个对象将负责为你执行方法解析。当你访问它的属性时，它将在所有的超类（以及超类的超类，等等）中查找，直到找到指定的属性或引发AttributeError异常。
+\end{tcolorbox}
+\section{元素访问}
+\begin{tcolorbox}
+在Python中，协议通常指的是规范行为的规则。协议指定应实现哪些方法以及这些方法应做什么。在Python中，多态仅仅基于对象的行为（而不基于祖先，如属于哪个类或其超类等），因此这个概念很重要：其他的语言可能要求对象属于特定的类或实现了特定的接口，而Python通常只要求对象遵循特定的协议。
+\end{tcolorbox}
+
+\subsection{基本的序列和映射协议}
+序列和映射基本上是元素（item）的集合，要实现它们的基本行为（协议），不可变对象需要实现2个方法，而可变对象需要实现4个。
+
+\begin{dinglist}{111}
+	\item \verb|__len__(self)|：这个方法应返回集合包含的项数，对序列来说为元素个数，对映射来说为键值对数。如果\verb|__len__|返回零（且没有实现覆盖这种行为的\verb|__nonzero__|），对象在布尔上下文中将被视为假（就像空的列表、元组、字符串和字典一样）。
+	\item \verb|__getitem__(self, key)|：这个方法应返回与指定键相关联的值。对序列来说，键应该是$0\sim n-1$的整数（也可以是负数，这将在后面说明），其中n为序列的长度。对映射来说，键可以是任何类型。
+	\item \verb|__setitem__(self, key, value)|：这个方法应以与键相关联的方式存储值，以便以后能够使用\verb|__getitem__|来获取。当然，仅当对象可变时才需要实现这个方法。
+	\item \verb|__delitem__(self, key)|：这个方法在对对象的组成部分使用\verb|__del__|语句时被调用，应删除与key相关联的值。同样，仅当对象可变（且允许其项被删除）时，才需要实现这个方法。
+\end{dinglist}
+
+对于这些方法，还有一些额外的要求。
+\begin{dinglist}{111}
+\item 对于序列，如果键为负整数，应从末尾往前数。换而言之，x[-n]应与x[len(x)-n]等效。
+\item 如果键的类型不合适（如对序列使用字符串键），可能引发TypeError异常。
+\item 对于序列，如果索引的类型是正确的，但不在允许的范围内，应引发IndexError异常。
+\end{dinglist}
+
+下面来试一试，看看能否创建一个无穷序列。
+\begin{pyc}
+def check_index(key):
+    """
+    Is the given key an acceptable index?
+    To be acceptable, the key should be a non-negative integer. 
+    If it is not an integer, a TypeError is raised; 
+    if it is negative, an IndexError is raised (since the sequence is of infinite length).
+    """
+    if not isinstance(key, int):
+        raise TypeError
+    if key < 0:
+        raise ValueError
+        
+class ArithmeticsSequence:
+    def __init__(self, start=0, step=1):
+        """        
+        Initialize the arithmetic sequence.
+        start - the first value in the sequence
+        step - the difference between two adjacent values
+        changed - a dictionary of values that have been modified by the user
+        """
+        self.start = start
+        self.step = step
+        self.changed = {}
+
+    def __getitem__(self, key):
+        """
+        Get an item from the arithmetic sequence.
+        """
+        check_index(key)
+        try:
+            return self.changed[key]
+        except KeyError:
+            return self.start + key * self.step
+
+    def __setitem__(self, key, value):
+        """
+        Change an item in the arithmetic sequence.
+        """
+        check_index(key)
+        self.changed[key] = value
+\end{pyc}
+
+下面的示例演示了如何使用这个类：
+\begin{pyc}
+s = ArithmeticsSequence(1, 2)
+s[4]  # 9
+s[4] = 2
+s[4]  # 2
+\end{pyc}
+
+请注意，禁止删除元素，因此没有实现\verb|__del__|，另外，这个类没有方法\verb|__len__|，因为其长度是无穷的。
+
+\subsection{从 list、dict 和 str 派生}
+基本的序列/映射协议指定的4个方法能够让你走很远，但序列还有很多其他有用的魔法方法和普通方法。要实现所有这些方法，不仅工作量大，而且难度不小。如果只想定制某种操作的行为，就没有理由去重新实现其他所有方法。这就是程序员的懒惰（也是常识）。
+
+关键就是继承，在标准库中，模块collections提供了抽象和具体的基类，但你也可以继承内置类型。因此，如果要实现一种行为类似于内置列表的序列类型，可直接继承list。
+
+\begin{pyc}
+class CounterList(list):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.counter = 0
+
+    def __getitem__(self, index):
+        self.counter += 1
+        return super(CounterList, self).__getitem__(index)
+        # return super().__getitem__(index)
+\end{pyc}
+\begin{tcolorbox}
+重写\verb|__getitem__|并不能保证一定会捕捉用户的访问操作，因为还有其他访问列表内容的方式，如通过方法pop。
+\end{tcolorbox}
+
+\begin{pyc}
+cl = CounterList(range(10))
+cl  # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+cl.reverse()
+cl  # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+cl.counter  # 0
+
+cl[4] + cl[2] + cl[3]
+cl.counter  # 3
+\end{pyc}
+
+如你所见，CounterList的行为在大多数方面都类似于列表，但它有一个counter属性（其初始值为0）。每当你访问列表元素时，这个属性的值都加1。执行加法运算\verb|cl[4] + cl[2] + cl[3]|后，counter的值递增三次，变成了3。
+
+特殊（魔法）名称的用途很多，前面展示的只是冰山一角。魔法方法大多是为非常高级的用途准备的，因此这里不详细介绍。然而，如果你感兴趣，可以模拟数字，让对象像函数一样被调用，影响对象的比较方式，等等。要更详细地了解有哪些魔法方法，可参阅“Python Reference Manual”的Special method names一节。
+
+\section{特性}
+如果访问给定属性时必须采取特定的措施，那么像这样封装状态变量（属性）很重要。请看下面的Rectangle类：
+\begin{pyc}
+class Rectangle:
+    def __init__(self):
+        self.width = 0
+        self.height = 0
+
+    def set_size(self, size):
+        self.width, self.height = size
+
+    def get_size(self):
+        return self.width, self.height
+r = Rectangle()
+r.width = 10
+r.height = 5
+r.get_size()  # (10, 5)
+r.set_size((150, 100))
+r.height  # 100
+\end{pyc}
+\verb|get_size|和\verb|set_size|是假想属性size的存取方法，这个属性是一个由width和height组成的元组。如果有一天你想修改实现，让size成为真正的属性，而width和height是动态计算出来的，就需要提供用于访问width和height的存取方法，使用这个类的程序也必须重写。应让客户端代码（使用你所编写代码的代码）能够以同样的方式对待所有的属性。
+
+那么如何解决这个问题呢？给所有的属性都提供存取方法吗？这当然并非不可能，但如果有大量简单的属性，这样做就不现实（而且有点傻），因为将需要编写大量这样的存取方法，除了获取或设置属性外什么都不做。这将引入复制并粘贴（重复代码）的坏味，显然很糟糕（虽然在有些语言中，这样的问题很常见）。所幸Python能够替你隐藏存取方法，让所有的属性看起来都一样。通过存取方法定义的属性通常称为特性（property）。
+
+\subsection{函数 property}
+函数property使用起来很简单。如果你编写了一个类，如前一节的Rectangle类，只需再添加一行代码。
+\begin{pyc}
+class Rectangle:
+    def __init__(self):
+        self.width = 0
+        self.height = 0
+
+    def set_size(self, size):
+        self.width, self.height = size
+
+    def get_size(self):
+        return self.width, self.height
+
+    size = property(get_size, set_size)
+\end{pyc}
+
+实际上，调用函数property时，还可不指定参数、指定一个参数、指定三个参数或指定四个参数。如果没有指定任何参数，创建的特性将既不可读也不可写。如果只指定一个参数（获取方法），创建的特性将是只读的。第三个参数是可选的，指定用于删除属性的方法（这个方法不接受任何参数）。第四个参数也是可选的，指定一个文档字符串。这些参数分别名为fget、fset、fdel和doc。如果你要创建一个只可写且带文档字符串的特性，可使用它们作为关键字参数来实现。
+
+\begin{tcolorbox}
+你可能很好奇，想知道特性是如何完成其魔法的，下面就来说一说。如果你对此不感兴趣，可跳过这些内容。
+
+property其实并不是函数，而是一个类。它的实例包含一些魔法方法，而所有的魔法都是由这些方法完成的。这些魔法方法为\verb|__get__|、\verb|__set__|和\verb|__delete__|，它们一道定义了所谓的描述符协议。只要对象实现了这些方法中的任何一个，它就是一个描述符。描述符的独特之处在于其访问方式。例如，读取属性（具体来说，是在实例中访问类中定义的属性）时，如果它关联的是一个实现了\verb|__get__|的对象，将不会返回这个对象，而是调用方法\verb|__get__|并将其结果返回。实际上，这是隐藏在特性、关联的方法、静态方法和类方法（详细信息请参阅下一小节）以及super后面的机制。
+
+有关描述符的详细信息，请参阅\href{https://docs.python.org/3/howto/descriptor.html}{Descriptor HowTo Guide}。
+\end{tcolorbox}
+\subsection{静态方法和类方法}
+静态方法和类方法是这样创建的：将它们分别包装在staticmethod和classmethod类的对象中。静态方法的定义中没有参数self，可直接通过类来调用。类方法的定义中包含类似于self的参数，通常被命名为cls。对于类方法，也可通过对象直接调用，但参数cls将自动关联到类。下面是一个简单的示例：
+\begin{pyc}
+class MyClass:
+    def smeth():
+        print('This is a static method')
+    smeth = staticmethod(smeth)
+
+    def cmeth(cls):
+        print('This is a class method of', cls)
+    cmeth = classmethod(cmeth)
+\end{pyc}
+像这样手工包装和替换方法有点繁琐。在Python 2.4中，引入了一种名为装饰器的新语法，可用于像这样包装方法。（实际上，装饰器可用于包装任何可调用的对象，并且可用于方法和函数。）可指定一个或多个装饰器，为此可在方法（或函数）前面使用运算符@列出这些装饰器（指定了多个装饰器时，应用的顺序与列出的顺序相反）。
+\begin{pyc}
+class MyClass:
+    @staticmethod
+    def smeth():
+        print('This is a static method')
+
+    @classmethod
+    def cmeth(cls):
+        print('This is a class method of', cls)
+\end{pyc}
+
+定义这些方法后，就可像下面这样使用它们（无需实例化类）。在Python中，静态方法和类方法以前一直都不太重要，主要是因为从某种程度上说，总是可以使用函数或关联的方法替代它们，而且早期的Python版本并不支持它们。因此，虽然较新的代码没有大量使用它们，但它们确实有用武之地（如工厂函数），因此你或许应该考虑使用它们。
+\begin{pyc}
+MyClass.smeth()  # This is a static method
+MyClass.cmeth()  # This is a class method of <class '__main__.MyClass'>
+\end{pyc}
+
+\subsection{\texttt{\_\_getattr\_\_}、\texttt{\_\_setattr\_\_}等方法}
+可以拦截对对象属性的所有访问企图，其用途之一是在旧式类中实现特性。要在属性被访问时执行一段代码，必须使用一些魔法方法。下面的四个魔法方法提供了你需要的所有功能（在旧式类中，只需使用后面三个）。
+\begin{dinglist}{111}
+\item \verb|__getattribute__(self, name)|：在属性被访问时自动调用（只适用于新式类）。
+\item \verb|__getattr__(self, name)|：在属性被访问而对象没有这样的属性时自动调用。
+\item \verb|__setattr__(self, name, value)|：试图给属性赋值时自动调用。
+\item \verb|__delattr__(self, name)|：试图删除属性时自动调用。
+\end{dinglist}
+这些魔法方法使用起来要棘手些（从某种程度上说，效率也更低），但它们很有用，因为你可在这些方法中编写处理多个特性的代码。然而，在可能的情况下，还是使用函数property吧。
+
+再来看前面的Rectangle示例：
+\begin{pyc}
+class Rectangle:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def __setattr__(self, name, value):
+        if name == 'size':
+            self.width, self.height = value
+        else:
+            self.__dict__[name] = value
+
+    def __getattr__(self, name):
+        if name == 'size':
+            return self.width, self.height
+        else:
+            raise AttributeError()
+\end{pyc}
+这个版本需要处理额外的管理细节。对于这个代码示例，需要注意如下两点：
+\begin{dinglist}{111}
+\item 即便涉及的属性不是size，也将调用方法\verb|__setattr__|。因此这个方法必须考虑如下两种情形：如果涉及的属性为size，就执行与以前一样的操作；否则就使用魔法属性\verb|__dict__|。\verb|__dict__|属性是一个字典，其中包含所有的实例属性。之所以使用它而不是执行常规属性赋值，是因为旨在避免再次调用\verb|__setattr__|，进而导致无限循环。
+\item 仅当没有找到指定的属性时，才会调用方法\verb|__getattr__|。这意味着如果指定的名称不是size，这个方法将引发AttributeError异常。这在要让类能够正确地支持hasattr和getattr等内置函数时很重要。如果指定的名称为size，就使用前一个实现中的表达式。
+\end{dinglist}
+\begin{tcolorbox}
+前面说过，编写方法\verb|__setattr__|时需要避开无限循环陷阱，编写\verb|__getattribute__|时亦如此。由于它拦截对所有属性的访问（在新式类中），因此将拦截对\verb|__dict__|的访问！在\verb|__getattribute__|中访问当前实例的属性时，唯一安全的方式是使用超类的方法\verb|__getattribute__|（使用super）。
+\end{tcolorbox}
+\section{迭代器}
+\subsection{迭代器协议}
+迭代（iterate）意味着重复多次，就像循环那样。本书前面只使用for循环迭代过序列和字典，但实际上也可迭代其他对象：实现了方法\verb|__iter__|的对象。
+
+方法\verb|__iter__|返回一个迭代器，它是包含方法\verb|__next__|的对象，而调用这个方法时可不提供任何参数。当你调用方法\verb|__next__|时，迭代器应返回其下一个值。如果迭代器没有可供返回的值，应引发StopIteration异常。（个人理解：\notes{next魔法函数就是将其返回值作为迭代中用的那个值，从迭代开始一直到结束每轮迭代都调用。不应该是什么返回下一值}）你还可使用内置的便利函数next，在这种情况下，\verb|next(it)|与\verb|it.__next__()|等效。
+
+这有什么意义呢？为何不使用列表呢？因为在很多情况下，使用列表都有点像用大炮打蚊子。例如，\important{如果你有一个可逐个计算值的函数，你可能只想逐个地获取值，而不是使用列表一次性获取。这是因为如果有很多值，列表可能占用太多的内存}。但还有其他原因：\tips{使用迭代器更通用、更简单、更优雅。}下面来看一个不能使用列表的示例，因为如果使用，这个列表的长度必须是无穷大的！
+
+\begin{pyc}
+class Fibs():
+    def __init__(self):
+        self.a = 0
+        self.b = 1
+
+    def __next__(self):
+        self.a, self.b = self.b, self.a + self.b
+        return self.a
+
+    def __iter__(self):
+        return self
+\end{pyc}
+
+注意到这个迭代器实现了方法\verb|__iter__|，而这个方法返回迭代器本身。在很多情况下，都在另一个对象中实现返回迭代器的方法\verb|__iter__|，并在for循环中使用这个对象。但推荐在迭代器中也实现方法\verb|__iter__|（并像刚才那样让它返回self），这样迭代器就可直接用于for循环中。
+
+\begin{tcolorbox}[colback=red!20]
+更正规的定义是，实现了方法\verb|__iter__|的对象是可迭代的，而实现了方法\verb|__next__|的对象是迭代器。
+\end{tcolorbox}
+首先，创建一个Fibs对象，然后就可在for循环中使用这个对象，如找出第一个大于1000的斐波那契数。
+\begin{pyc}
+fibs = Fibs()
+for i in fibs:
+    if i > 1000:
+        print(i)  # 1597
+        break
+\end{pyc}
+
+\begin{tcolorbox}
+通过对可迭代对象调用内置函数iter，可获得一个迭代器。
+\begin{pyc}
+it = iter([1, 2, 3])
+next(it)  # 1
+next(it)  # 2
+\end{pyc}
+\end{tcolorbox}
+\subsection{从迭代器创建序列}
+除了对迭代器和可迭代对象进行迭代（通常这样做）之外，还可将它们转换为序列。在可以使用序列的情况下，大多也可使用迭代器或可迭代对象（诸如索引和切片等操作除外）。
+\begin{pyc}
+class TestIterator:
+    value = 0
+
+    def __next__(self):
+        self.value += 1
+        if self.value > 10:
+            raise StopIteration
+        return self.value
+
+    def __iter__(self):
+        return self
+ti = TestIterator()
+list(ti)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+\end{pyc}
+\section{生成器}
+生成器是一个相对较新的Python概念。由于历史原因，它也被称为简单生成器（simple generator）。生成器和迭代器可能是近年来引入的最强大的功能，但生成器是一个相当复杂的概念，你可能需要花些功夫才能明白其工作原理和用途。
+
+生成器是一种使用普通函数语法定义的迭代器。
+\subsection{创建生成器}
+创建一个将嵌套列表展开的函数，这个函数将一个类似于下面的列表作为参数：
+\begin{pyc}
+def flatten(nested):
+    for sublist in nested:
+        for element in sublist:
+            yield element
+\end{pyc}
+包含yield语句的函数都被称为生成器。这可不仅仅是名称上的差别，生成器的行为与普通函数截然不同。\important{差别在于，生成器不是使用return返回一个值，而是可以生成多个值，每次一个。每次使用yield生成一个值后，函数都将冻结，即在此停止执行，等待被重新唤醒。被重新唤醒后，函数将从停止的地方开始继续执行}。
+
+为使用所有的值，可对生成器进行迭代。
+\begin{pyc}
+nested = [[2, 2,], [4, 0], [5]]
+for num in flatten(nested):
+    print(num)
+# or
+list(flatten(nested))  # [2, 2, 4, 0, 5]
+\end{pyc}
+
+\begin{tcolorbox}[title=简单生成器,colback=red!5]
+在Python 2.4中，引入了一个类似于列表推导的概念：生成器推导（也叫生成器表达式）。其工作原理与列表推导相同，但不是创建一个列表（即不立即执行循环），而是返回一个生成器，让你能够逐步执行计算。
+\begin{pyc}
+g = ((i + 2) ** 2 for i in range(2, 27))
+next(g)  # 16
+next(g)  # 25
+\end{pyc}
+
+如你所见，不同于列表推导，这里使用的是圆括号。在像这样的简单情形下，还不如使用列表推导；但如果要包装可迭代对象（可能生成大量的值），使用列表推导将立即实例化一个列表，从而丧失迭代的优势。
+
+另一个好处是，直接在一对既有的圆括号内（如在函数调用中）使用生成器推导时，无需再添加一对圆括号。换而言之，可编写下面这样非常漂亮的代码：
+
+\verb|sum(i ** 2 for i in range(10))|
+\end{tcolorbox}
+\subsection{递归式生成器}
+前一节设计的生成器只能处理两层的嵌套列表，这是使用两个for循环来实现的。如果要处理任意层嵌套的列表，该如何办呢？对于每层嵌套，都需要一个for循环，但由于不知道有多少层嵌套，你必须修改解决方案，使其更灵活。该求助于递归了。
+
+\begin{pyc}
+def flatten(nested):
+    try:
+        for sublist in nested:
+            for element in flatten(sublist):
+                yield element
+    except TypeError:
+        yield nested
+\end{pyc}
+
+调用flatten时，有两种可能性（处理递归时都如此）：基线条件和递归条件。在基线条件下，要求这个函数展开单个元素（如一个数）。在这种情况下，for循环将引发TypeError异常（因为你试图迭代一个数），而这个生成器只生成一个元素。然而，如果要展开的是一个列表（或其他任何可迭代对象），你就需要做些工作：遍历所有的子列表（其中有些可能并不是列表）并对它们调用flatten，然后使用另一个for循环生成展开后的子列表中的所有元素。
+\begin{pyc}
+list(flatten([[[1, 2, 2], 1, [1, 2, 1], 1], 1, [1, 1, 1]]))
+# [1, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1]
+\end{pyc}
+然而，这个解决方案存在一个问题。如果nested是字符串或类似于字符串的对象，它就属于序列，因此不会引发TypeError异常，可你并不想对其进行迭代。
+\begin{tcolorbox}
+在函数flatten中，不应该对类似于字符串的对象进行迭代，主要原因有两个。首先，你想将类似于字符串的对象视为原子值，而不是应该展开的序列。其次，对这样的对象进行迭代会导致无穷递归，因为字符串的第一个元素是一个长度为1的字符串，而长度为1的字符串的第一个元素是字符串本身！
+\end{tcolorbox}
+要处理这种问题，必须在生成器开头进行检查。要检查对象是否类似于字符串，最简单、最快捷的方式是，尝试将对象与一个字符串拼接起来，并检查这是否会引发TypeError异常。
+
+\begin{pyc}
+def flatten(nested):
+    try:
+        try:
+            nested + ''
+        except TypeError:
+            pass
+        else:
+            raise TypeError
+        for sublist in nested:
+            for element in flatten(sublist):
+                yield element
+    except TypeError:
+        yield nested
+\end{pyc}
+如果表达式\verb|nested + ''|引发了TypeError异常，就忽略这种异常；如果没有引发TypeError异常，内部try语句中的else子句将引发TypeError异常，这样将在外部的excpet子句中原封不动地生成类似于字符串的对象。
+\begin{pyc}
+list(flatten(['foo', ['bar', ['baz']]]))
+# ['foo', 'bar', 'baz']
+\end{pyc}
+这里没有执行类型检查：我没有检查nested是否是字符串，而只是检查其行为是否类似于字符串，即能否与字符串拼接。对于这种检查，一种更自然的替代方案是，使用isinstance以及字符串和类似于字符串的对象的一些抽象超类，但遗憾的是没有这样的标准类。另外，即便是对UserString来说，也无法检查其类型是否为str。
+
+\subsection{通用生成器}
+生成器是包含关键字yield的函数，但被调用时不会执行函数体内的代码，而是返回一个迭代器。每次请求值时，都将执行生成器的代码，直到遇到yield或return。yield意味着应生成一个值，而return意味着生成器应停止执行（即不再生成值；仅当在生成器调用return时，才能不提供任何参数）。
+
+换而言之，生成器由两个单独的部分组成：生成器的函数和生成器的迭代器。生成器的函数是由def语句定义的，其中包含yield。生成器的迭代器是这个函数返回的结果。用不太准确的话说，这两个实体通常被视为一个，通称为生成器。
+\begin{pyc}
+def simple_generator():
+    yield 1
+simple_generator
+# <function __main__.simple_generator()>
+simple_generator()
+# <generator object simple_generator at 0x000001BEF4C3D380>
+\end{pyc}
+对于生成器的函数返回的迭代器，可以像使用其他迭代器一样使用它。
+
+\subsection{生成器的方法}
+在生成器开始运行后，可使用生成器和外部之间的通信渠道向它提供值。这个通信渠道包含如下两个端点。
+\begin{enumerate}
+\item 外部世界：外部世界可访问生成器的方法send，这个方法类似于next，但接受一个参数（要发送的“消息”，可以是任何对象）。
+\item 生成器：在挂起的生成器内部，yield可能用作表达式而不是语句。换而言之，当生成器重新运行时，yield返回一个值——通过send从外部世界发送的值。如果使用的是next，yield将返回None。
+\end{enumerate}
+请注意，仅当生成器被挂起（即遇到第一个yield）后，使用send（而不是next）才有意义。要在此之前向生成器提供信息，可使用生成器的函数的参数。
+\begin{pyc}
+def repeater(value):
+    while True:
+        new = (yield value)
+        if new is not None:
+            value = new
+r = repeater(42)
+next(r)  # 42
+r.send('Hello, world')  # Hello, world
+\end{pyc}
+如果要以某种方式使用返回值，就不管三七二十一，将其用圆括号括起吧。生成器还包含另外两个方法：
+\begin{enumerate}
+\item 方法throw：用于在生成器中（yield表达式处）引发异常，调用时可提供一个异常类型、一个可选值和一个traceback对象。
+\item 方法close：用于停止生成器，调用时无需提供任何参数。
+\end{enumerate}
+方法close（由Python垃圾收集器在需要时调用）也是基于异常的：在yield处引发GeneratorExit异常。因此如果要在生成器中提供一些清理代码，可将yield放在一条try/finally语句中。
+\subsection{模拟生成器}
+如果你使用的是较老的Python版本，就无法使用生成器。下面是一个简单的解决方案，让你能够使用普通函数模拟生成器。首先，在函数体开头插入如下代码\verb|results = []|。接下来，将类似于
+
+\verb|yield some_expression|
+
+的代码行替换为如下代码行：
+\begin{pyc}
+yield some_expression with this:
+result.append(some_expression)
+\end{pyc}
+最后，在函数末尾添加如下代码\verb|return result|。
+
+尽管使用这种方法并不能模拟所有的生成器，但可模拟大部分生成器。例如，这无法模拟无穷生成器，因为显然不能将这种生成器的值都存储到一个列表中。
+
+下面使用普通函数重写了生成器flatten：
+\begin{pyc}
+def flatten(nested):
+    result = []
+    try:
+        try:
+            nested + ''
+        except TypeError:
+            pass
+        else:
+            raise TypeError
+        for sublist in nested:
+            for element in flatten(sublist):
+                result.append(element)
+    except TypeError:
+        result.append(nested)
+    return result
+\end{pyc}
+\section{八皇后问题}
+\subsection{生成器的回溯}
+对于逐步得到结果的复杂递归算法，非常适合使用生成器来实现。要在不使用生成器的情况下实现这些算法，通常必须通过额外的参数来传递部分结果，让递归调用能够接着往下计算。通过使用生成器，所有的递归调用都只需生成其负责部分的结果。前面的递归版flatten就是这样做的，你可使用这种策略来遍历图结构和树结构。
+
+然而，在有些应用程序中，你不能马上得到答案。你必须尝试多次，且在每个递归层级中都如此。打个现实生活中的比方吧，假设你要去参加一个很重要的会议。你不知道会议在哪里召开，但前面有两扇门，而会议室就在其中一扇门的后面。你选择进入左边那扇门后，又看到两扇门。你再次选择进入左边那扇门，但发现走错了。因此你往回走，并进入右边那扇门，但发现也走错了。因此你继续往回走到起点，现在可以尝试进入右边那扇门。
+
+\begin{tcolorbox}[title=图和树]
+下面的网页提供了有关图和树的简明定义：
+\begin{itemize}
+\item \url{http://mathworld.wolfram.com/Graph.html}
+\item \url{https://mathworld.wolfram.com/Tree.html}
+\item \url{https://mathworld.wolfram.com/Tree.html}
+\item \url{https://xlinux.nist.gov/dads/HTML/graph.html}
+\end{itemize}
+\end{tcolorbox}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

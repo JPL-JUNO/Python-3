@@ -1,0 +1,367 @@
+\chapter{异常\label{chapter08}}
+编写计算机程序时，通常能够区分正常和异常（不正常）情况。异常事件可能是错误（如试图除以零），也可能是通常不会发生的事情。为处理这些异常事件，可在每个可能发生这些事件的地方都使用条件语句。然而，这样做不仅效率低下、缺乏灵活性，还可能导致程序难以卒读。你可能很想忽略这些异常事件，希望它们不会发生，但Python提供功能强大的替代解决方案——\textbf{异常处理机制}。
+\section{异常是什么}
+Python使用异常对象来表示异常状态，并在遇到错误时引发异常。异常对象未被处理（或捕获）时，程序将终止并显示一条错误消息（traceback）。
+
+\verb|1 / 0  # ZeroDivisionError: division by zero|
+
+如果异常只能用来显示错误消息，就没多大意思了。但事实上，每个异常都是某个类（这里是ZeroDivisionError）的实例。你能以各种方式引发和捕获这些实例，从而逮住错误并采取措施，而不是放任整个程序失败。
+\section{让事情能够沿着你指定的轨道出错}
+出现问题时，将自动引发异常。先来看看如何自主地引发异常，还有如何创建异常，然后再学习如何处理这些异常。
+\subsection{raise语句}
+要引发异常，可使用raise语句，并将一个类（必须是Exception的子类）或实例作为参数。将类作为参数时，将自动创建一个实例。
+
+\begin{pyc}
+raise Exception  # Exception:
+raise Exception("hyperdrive overload")  # Exception: hyperdrive overload
+\end{pyc}
+在第一个示例（raise Exception）中，引发的是通用异常，没有指出出现了什么错误。在第二个示例中，添加了错误消息hyperdrive overload。
+
+有很多内置的异常类，\autoref{builtinexceptionclasses}描述了最重要的几个，这些异常类都可用于raise语句中。
+
+\begin{table}
+    \centering
+    \caption{一些内置的异常类}
+    \label{builtinexceptionclasses}
+    \begin{tabular}{ll}
+        \hline
+        类 名               & 描 述                              \\
+        \hline
+        Exception         & 几乎所有的异常类都是从它派生而来的                \\
+        AttributeError    & 引用属性或给它赋值失败时引发                   \\
+        OSError           & 操作系统不能执行指定的任务（如打开文件）时引发，有多个子类    \\
+        IndexError        & 使用序列中不存在的索引时引发，为LookupError的子类   \\
+        KeyError          & 使用映射中不存在的键时引发，为LookupError的子类    \\
+        NameError         & 找不到名称（变量）时引发                     \\
+        SyntaxError       & 代码不正确时引发                         \\
+        TypeError         & 将内置操作或函数用于类型不正确的对象时引发            \\
+        ValueError        & 将内置操作或函数用于这样的对象时引发：其类型正确但包含的值不合适 \\
+        ZeroDivisionError & 在除法或求模运算的第二个参数为零时引发              \\
+        \hline
+    \end{tabular}
+\end{table}
+\subsection{自定义的异常类}
+虽然内置异常涉及的范围很广，能够满足很多需求，但有时你可能想自己创建异常类。可基于异常所属的类选择性地处理异常。因此，就必须有一个专门用于表示这些异常的类。
+
+那么如何创建异常类呢？就像创建其他类一样，但务必直接或间接地继承Exception（这意味着从任何内置异常类派生都可以）。因此，自定义异常类的代码类似于下面这样：
+\begin{pyc}
+class SomeCustomException(Exception):
+    pass
+\end{pyc}
+当然，如果你愿意，也可在自定义异常类中添加方法。
+\section{捕获异常}
+异常比较有趣的地方是可对其进行处理，通常称之为捕获异常。为此，可使用try/except语句。
+
+\begin{pyc}
+x = int(input('Enter the first number: '))
+y = int(input('Enter the second number: '))
+print(x / y)
+\end{pyc}
+这个程序运行正常，直到用户输入的第二个数为零。为捕获这种异常并对错误进行处理，可像下面这样重写这个程序：
+
+\begin{pyc}
+try:
+    x = int(input('Enter the first number: '))
+    y = int(input('Enter the second number: '))
+    print(x / y)
+except ZeroDivisionError:
+    print("The second number can't be zero.")
+\end{pyc}
+使用一条if语句来检查y的值好像简单些，就本例而言，这可能也是更佳的解决方案。然而，如果这个程序执行的除法运算更多，则每个除法运算都需要一条if语句，而使用try/except的话只需要一个错误处理程序。
+
+\begin{tcolorbox}
+异常从函数向外传播到调用函数的地方。如果在这里也没有被捕获，异常将向程序的最顶层传播。这意味着你可使用try/except来捕获他人所编写函数引发的异常。
+\end{tcolorbox}
+\subsection{不用提供参数}
+捕获异常后，如果要重新引发它（即继续向上传播），可调用raise且不提供任何参数（也可显式地提供捕获到的异常）。
+
+为说明这很有用，来看一个能够“抑制”异常ZeroDivisionError的计算器类。如果启用了这种功能，计算器将打印一条错误消息，而不让异常继续传播。在与用户交互的会话中使用这个计算器时，抑制异常很有用；但在程序内部使用时，引发异常是更佳的选择（此时应关闭“抑制”功能）。下面是这样一个类的代码：
+
+\begin{pyc}
+class MuffledCalculator:
+    muffled = False
+
+    def calc(self, expr):
+        try:
+            return eval(expr)
+        except ZeroDivisionError:
+            if self.muffled:
+                print('Division by zero is illegal')
+            else:
+                raise
+\end{pyc}
+
+\begin{tcolorbox}
+发生除零行为时，如果启用了“抑制”功能，方法calc将（隐式地）返回None。换而言之，如果启用了“抑制”功能，就不应依赖返回值。
+\end{tcolorbox}
+
+下面的示例演示了这个类的用法（包括启用和关闭了抑制功能的情形）：
+
+\begin{pyc}
+calculator = MuffledCalculator()
+calculator.calc('10 / 2')  # 5.0
+# calculator.calc('10 / 0')  # ZeroDivisionError: division by zero
+calculator.muffled = True
+calculator.calc('10 / 0')  # Division by zero is illegal
+ret = calculator.calc('10 / 0')
+print(ret)  # None
+\end{pyc}
+
+如果无法处理异常，在except子句中使用不带参数的raise通常是不错的选择，但有时你可能想引发别的异常。在这种情况下，导致进入except子句的异常将被作为异常上下文存储起来，并出现在最终的错误消息中，如下所示：
+\begin{pyc}
+try:
+    1/0
+except ZeroDivisionError:
+    raise ValueError
+\end{pyc}
+
+你可使用raise ... from ...语句来提供自己的异常上下文，也可使用None来禁用上下文。
+\begin{pyc}
+try:
+    1/0
+except ZeroDivisionError:
+    raise ValueError from None
+\end{pyc}
+
+\subsection{多个except子句}
+在前面的输入两个数做除法的案例中，如果用户输入的是字符串，那么这样的异常回导致程序运行失败。该程序中的except子句只捕获ZeroDivisionError异常。为同时捕获这种异常，可在try/except语句中再添加一个except子句。
+\begin{pyc}
+try:
+    x = int(input('Enter the first number: '))
+    y = int(input('Enter the second number: '))
+except ZeroDivisionError:
+    print("The second number can't be zero!")
+except ValueError:
+    print("That wasn't a number, was it?")
+\end{pyc}
+\subsection{一箭双雕}
+如果要使用一个except子句捕获多种异常，可在一个元组中指定这些异常：
+\begin{pyc}
+try:
+    x = int(input('Enter the first number: '))
+    y = int(input('Enter the second number: '))
+except (ZeroDivisionError, ValueError, TypeError):
+    print('Your numbers were bogus...')
+\end{pyc}
+当然，仅仅打印错误消息帮助不大。另一种解决方案是不断地要求用户输入数字，直到能够执行除法运算为止。
+
+在except子句中，异常两边的圆括号很重要。一种常见的错误是省略这些括号，这可能导致你不想要的结果。
+\subsection{捕获对象}
+要在except子句中访问异常对象本身，可使用两个而不是一个参数。（请注意，即便是在你捕获多个异常时，也只向except提供了一个参数——一个元组。）
+
+下面的示例程序打印发生的异常并继续运行：
+\begin{pyc}
+try:
+    x = int(input('Enter the first number: '))
+    y = int(input('Enter the second number: '))
+except (ZeroDivisionError, ValueError, TypeError) as e:
+    print(e)
+\end{pyc}
+在这个程序中，except子句也捕获两种异常，但由于你同时显式地捕获了对象本身，因此可将其打印出来，让用户知道发生了什么情况。
+\subsection{一网打尽}
+即使程序处理了好几种异常，还是可能有一些漏网之鱼。然而，如果你就是要使用一段代码捕获所有的异常，只需在except语句中不指定任何异常类即可。
+
+\begin{pyc}
+try:
+    x = int(input('Enter the first number: '))
+    y = int(input('Enter the second number: '))
+except:
+    print('Something wrong happened...')
+\end{pyc}
+
+像这样捕获所有的异常很危险，因为这不仅会隐藏你有心理准备的错误，还会隐藏你没有考虑过的错误。这还将捕获用户使用Ctrl + C终止执行的企图、调用函数sys.exit来终止执行的企图等。在大多数情况下，更好的选择是使用except Exception as e并对异常对象进行检查。这样做将让不是从Exception派生而来的为数不多的异常成为漏网之鱼，其中包括SystemExit和KeyboardInterrupt，因为它们是从BaseException（Exception的超类）派生而来的。
+
+\subsection{万事大吉时}
+在有些情况下，在没有出现异常时执行一个代码块很有用。为此，可像条件语句和循环一样，给try/except语句添加一个else子句。
+\begin{pyc}
+try:
+    print('A simple example')
+except:
+    print('What? Something went wrong ... ')
+else:
+    print('Ah ... It went as planned.')
+# A simple example
+# Ah ... It went as planned.
+\end{pyc}
+通过使用else子句，可以实现在用户输入错误参数时不断地再次输入。
+\begin{pyc}
+while True:
+    try:
+        x = int(input('Enter the first number: '))
+        y = int(input('Enter the second number: '))
+        value = x / y
+        print('x / y is', value)
+    except:
+        print('Invalid input. Please try again.')
+    else:
+        break
+\end{pyc}
+在这里，仅当没有引发异常时，才会跳出循环。换而言之，只要出现错误，程序就会要求用户提供新的输入。
+
+一种更佳的替代方案是使用空的except子句来捕获所有属于类Exception（或其子类）的异常。你不能完全确定这将捕获所有的异常，因为try/except语句中的代码可能使用旧式的字符串异常或引发并非从Exception派生而来的异常。然而，如果使用\verb|except Exception as e|，就可以在这个小型除法程序中打印更有用的错误消息。
+\begin{pyc}
+while True:
+    try:
+        x = int(input('Enter the first number: '))
+        y = int(input('Enter the second number: '))
+        value = x / y
+        print('x / y is', value)
+    except Exception as e:
+        print('Invalid input.', e)
+        print('Please try again.')
+    else:
+        break
+# Invalid input. division by zero
+# Please try again.
+# Invalid input. invalid literal for int() with base 10: 'a'
+# Please try again.
+# x / y is 0.5
+\end{pyc}
+\subsection{finally}
+最后，还有finally子句，可用于在发生异常时执行清理工作。这个子句是与try子句配套的。
+\begin{pyc}
+x = None
+try:
+    x = 1 / 0 
+finally:
+    print('Cleaning up...')
+    del x
+\end{pyc}
+在上述示例中，不管try子句中发生什么异常，都将执行finally子句。为何在try子句之前初始化x呢？因为如果不这样做，ZeroDivisionError将导致根本没有机会给它赋值，进而导致在finally子句中对其执行del时引发未捕获的异常。
+
+如果运行这个程序，它将在执行清理工作后崩溃。
+
+虽然使用del来删除变量是相当愚蠢的清理措施，但finally子句非常适合用于确保文件或网络套接字等得以关闭。
+
+也可在一条语句中同时包含try、except、finally和else（或其中的3个）。
+\begin{pyc}
+try:
+    1 / 0
+except ZeroDivisionError:
+    print('Unknown variable')
+else:
+    print('That went well!')
+finally:
+    print('Cleaning up...')
+\end{pyc}
+
+\section{异常和函数}
+异常和函数有着天然的联系。如果不处理函数中引发的异常，它将向上传播到调用函数的地方。如果在那里也未得到处理，异常将继续传播，直至到达主程序（全局作用域）。如果主程序中也没有异常处理程序，程序将终止并显示栈跟踪消息。来看一个示例：
+\begin{pyc}
+def faulty():
+    raise Exception('Something went wrong!')
+def ignore_exception():
+    faulty()
+def handle_exception():
+    try:
+        faulty()
+    except:
+        print('Exception handled.')
+faulty()  # Exception: Something went wrong!
+handle_exception()  # Exception handled.
+\end{pyc}
+faulty中引发的异常依次从faulty和\verb|ignore_exception|向外传播，最终导致显示一条栈跟踪消息。调用\verb|handle_exception|时，异常最终传播到\verb|handle_exception|，并被这里的try/except语句处理。
+\section{异常之禅}
+如果你知道代码可能引发某种异常，且不希望出现这种异常时程序终止并显示栈跟踪消息，可添加必要的try/except或try/finally语句（或结合使用）来处理它。
+
+有时候，可使用条件语句来达成异常处理实现的目标，但这样编写出来的代码可能不那么自然，可读性也没那么高。另一方面，有些任务使用if/else完成时看似很自然，但实际上使用try/except来完成要好得多。下面来看两个示例。
+
+\begin{tcolorbox}[title=假设有一个字典，你要在指定的键存在时打印与之相关联的值，否则什么都不做。]
+\begin{pyc}
+def describe_person(person):
+    print('Description of', person['name'])
+    print('Age: ', person['age'])
+    if 'occupation' in person:
+        print('Occupation: ', person['occupation'])
+person = {'name': 'John', 'age': 42}
+describe_person(person)
+# Description of John
+# Age:  42
+\end{pyc}
+
+这段代码很直观，但效率不高（虽然这里的重点是代码简洁），因为它必须两次查找'occupation'键：一次检查这个键是否存在（在条件中），另一次获取这个键关联的值，以便将其打印出来。下面是另一种解决方案：
+
+\begin{pyc}
+def describe_person(person):
+    print('Description of', person['name'])
+    print('Age: ', person['age'])
+    try:
+        print('Occupation: ', person['occupation'])
+    except:
+        pass
+describe_person(person)
+\end{pyc}
+\end{tcolorbox}
+
+你可能发现，检查对象是否包含特定的属性时，try/except也很有用。例如，假设你要检查一个对象是否包含属性write，可使用类似于下面的代码：
+\begin{pyc}
+try:
+    obj.write
+except AttributeError:
+    print('The object is not writeable')
+else:
+    print('The object is writeable')
+\end{pyc}
+
+请注意，这里在效率方面的提高并不大（实际上是微乎其微）。一般而言，除非程序存在性能方面的问题，否则不应过多考虑这样的优化。关键是在很多情况下，相比于使用if/else，使用try/except语句更自然，也更符合Python的风格。因此你应养成尽可能使用try/except语句的习惯\footnote{海军少将Grace Hopper有句至理名言：请求宽恕比获得允许更容易。这解释了Python偏向于使用try/except的原因。这种策略可总结为习语“闭眼就跳”——直接去做，有问题再处理，而不是预先做大量的检查。}。
+\section{不那么异常的情况}
+如果你只想发出警告，指出情况偏离了正轨，可使用模块warnings中的函数warn。
+
+\begin{pyc}
+from warnings import warn
+warn("I've got a bad feeling about this.")
+# UserWarning: I've got a bad feeling about this.
+\end{pyc}
+
+如果其他代码在使用你的模块，可使用模块warnings中的函数filterwarnings来抑制你发出的警告（或特定类型的警告），并指定要采取的措施,如"error"或"ignore"。
+\begin{pyc}
+from warnings import filterwarnings
+filterwarnings('ignore')
+warn('Anyone out there?')
+
+filterwarnings('error')
+warn('Something is very wrong!')
+# UserWarning: Something is very wrong!
+\end{pyc}
+引发的异常为UserWarning。发出警告时，可指定将引发的异常（即警告类别），但必须是Warning的子类。如果将警告转换为错误，将使用你指定的异常。
+
+另外，还可根据异常来过滤掉特定类型的警告。
+\begin{pyc}
+from warnings import warn
+from warnings import filterwarnings
+filterwarnings('error')
+warn('This function is really old...', DeprecationWarning)
+# DeprecationWarning: This function is really old...
+
+filterwarnings('ignore', category=DeprecationWarning)
+warn('Another deprecation warning', DeprecationWarning)
+warn('Something else')  # UserWarning: Something else
+\end{pyc}
+
+除上述基本用途外，模块warnings还提供了一些高级功能。如果你对此感兴趣，请参阅库参考手册。
+\section{小结}
+
+本章介绍了如下重要主题。
+\begin{dinglist}{43}
+\item 异常对象：异常情况（如发生错误）是用异常对象表示的。对于异常情况，有多种处理方式；如果忽略，将导致程序终止。
+\item 引发异常：可使用raise语句来引发异常。它将一个异常类或异常实例作为参数，但你也可提供两个参数（异常和错误消息）。如果在except子句中调用raise时没有提供任何参数，它将重新引发该子句捕获的异常。
+\item 自定义的异常类：你可通过从Exception派生来创建自定义的异常。
+\item 捕获异常：要捕获异常，可在try语句中使用except子句。在except子句中，如果没有指定异常类，将捕获所有的异常。你可指定多个异常类，方法是将它们放在元组中。如果向except提供两个参数，第二个参数将关联到异常对象。在同一条try/except语句中，可包含多个except子句，以便对不同的异常采取不同的措施。
+\item else子句：除except子句外，你还可使用else子句，它在主try块没有引发异常时执行。
+\item finally：要确保代码块（如清理代码）无论是否引发异常都将执行，可使用try/finally，并将代码块放在finally子句中。
+\item 异常和函数：在函数中引发异常时，异常将传播到调用函数的地方（对方法来说亦如此）。
+\item 警告：警告类似于异常，但（通常）只打印一条错误消息。你可指定警告类别，它们是Warning的子类。
+\end{dinglist}
+
+\subsection{一些新函数}
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{lX}
+        \hline
+        函 数                                                          & 描 述    \\
+        \hline
+        \verb|warnings.filterwarnings(action,category=Warning, ...)| & 用于过滤警告 \\
+        \verb|warnings.warn(message, category=None)|                 & 用于发出警告 \\
+        \hline
+    \end{tabularx}
+\end{table}

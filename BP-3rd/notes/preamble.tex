@@ -1,0 +1,104 @@
+\usepackage{amsmath}
+\usepackage{mathptmx}
+\usepackage{ctex}
+\usepackage{minted}
+\usepackage{tcolorbox}
+\tcbuselibrary{minted, skins, breakable}
+% 全局设置tcb可以断开，不是必须连续
+\tcbset{breakable}
+\usepackage{epigraph}
+\usepackage{caption}
+\usepackage{graphicx}
+\setkeys{Gin}{width=0.7\textwidth}
+\usepackage{listings}
+\newtheorem{theorem}{Theorem}
+\usepackage{tikz}
+\usepackage{pifont}
+\usepackage{tabularx}
+\usepackage{framed}
+
+
+\setminted[python]{bgcolor=red!5, xleftmargin=20pt, linenos, breakanywhere=true,fontsize=\small,baselinestretch=1.1}
+%定义新的minted命令
+\newminted[pyc]{python}{}
+
+\title{\textbf{Python基础教程}\\
+	Beginning Python From Novice to Professional, 3rd Edition
+}
+
+\author{Stephen CUI\thanks{cuixuanStephen@gmail.com}}
+\date{October 30, 2022}
+\newcommand\explain[2]{
+	\begin{tcolorbox}[breakable,colback=orange!5,colframe=orange!95!black,title=\textbf{#1}]
+		#2
+	\end{tcolorbox}
+}
+
+% \newcommand\tips[1]{
+% 	\begin{tcolorbox}[breakable, colback=green!7, colframe=green!70!black,title=Suggestions]
+% 		#1
+% 	\end{tcolorbox}
+% }
+
+% \newcommand\notes[1]{
+% 	\begin{tcolorbox}[breakable, colback=blue!7, colframe=blue!70!black,title=Notes]
+% 		#1
+% 	\end{tcolorbox}
+% }
+
+\newcommand\warning[1]{
+	\begin{tcolorbox}[breakable, colback=orange!7, colframe=orange!70!black,title=Warnings]
+		#1
+	\end{tcolorbox}
+}
+\newcommand\tips[1]{\textcolor{green!70!black}{#1}}
+\newcommand\notes[1]{\textcolor{blue!70}{#1}}
+% \newcommand\warning[1]{\textcolor{orange!90!black}{\textbf{Warnings: } #1}}
+\newcommand\important[1]{\textcolor{red!90!black}{#1}}
+\newcommand\figures[1]{
+	\begin{figure}
+		\centering
+		\includegraphics{img/codes/#1.png}
+		\caption{#1}
+		\label{#1}
+	\end{figure}
+}
+
+
+
+\newtcblisting[auto counter, number within =chapter]{py}[1]{listing engine=minted,
+	minted style=colorful,
+	minted language=python,
+	minted options={breaklines,autogobble,linenos,numbersep=3mm},
+	colback=red!5!white,colframe=orange!50!blue,listing only, left=5mm,enhanced,
+	title=Examples~\thetcbcounter~#1,
+	breakable,
+	enhanced
+	%						 overlay={
+	%						 	\begin{tcbclipinterior}
+	%						 		\fill[red!30!white] (frame.south west)
+	%						 		rectangle ([xshift=5mm]frame.north west);
+	%							\end{tcbclipinterior}}
+}
+
+% \usepackage{geometry}
+% \geometry{left=2.45cm,right=2.45cm, top=2.77cm, bottom=1.77cm}
+
+\usepackage{hyperref}
+% 将引用的chapter改写为Chapter
+\usepackage[english]{babel}
+\addto\extrasenglish{
+	\def\chapterautorefname{Chapter}
+}
+\addto\extrasenglish{
+	\def\sectionautorefname{Section}
+}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=orange!95!black,
+	filecolor=blue,
+	urlcolor=red!75!black,
+	citecolor=green,
+}
+
+

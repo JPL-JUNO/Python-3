@@ -1,0 +1,42 @@
+'\d+' (sequence of digits)
+
+  'A prime #1 example!'
+  .........'1'
+
+'\D+' (sequence of non-digits)
+
+  'A prime #1 example!'
+  'A prime #'
+  ..........' example!'
+
+'\s+' (sequence of whitespace)
+
+  'A prime #1 example!'
+  .' '
+  .......' '
+  ..........' '
+
+'\S+' (sequence of non-whitespace)
+
+  'A prime #1 example!'
+  'A'
+  ..'prime'
+  ........'#1'
+  ...........'example!'
+
+'\w+' (alphanumeric characters)
+
+  'A prime #1 example!'
+  'A'
+  ..'prime'
+  .........'1'
+  ...........'example'
+
+'\W+' (non-alphanumeric)
+
+  'A prime #1 example!'
+  .' '
+  .......' #'
+  ..........' '
+  ..................'!'
+

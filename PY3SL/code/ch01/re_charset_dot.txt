@@ -1,0 +1,24 @@
+'a.' (a followed by any one character)
+
+  'abbaabbba'
+  'ab'
+  ...'aa'
+
+'b.' (b followed by any one character)
+
+  'abbaabbba'
+  .'bb'
+  .....'bb'
+  .......'ba'
+
+'a.*b' (a followed by anything, ending in b)
+
+  'abbaabbba'
+  'abbaabbb'
+
+'a.*?b' (a followed by anything, ending in b, not greedy)
+
+  'abbaabbba'
+  'ab'
+  ...'aab'
+
