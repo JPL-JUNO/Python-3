@@ -1,0 +1,7 @@
+'a((a*)(b*))' (a followed by 0-n a and 0-n b)
+
+  'abbaabbba'
+  'abb'        ('bb', '', 'bb')
+     'aabbb'   ('abbb', 'a', 'bbb')
+          'a'  ('', '', '')
+

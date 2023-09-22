@@ -1,0 +1,33 @@
+'ab*?' (a followed by zero or more b)
+
+  'abbaabbba'
+  'a'
+  ...'a'
+  ....'a'
+  ........'a'
+
+'ab+?' (a followed by one or more b)
+
+  'abbaabbba'
+  'ab'
+  ....'ab'
+
+'ab??' (a followed by zero or one b)
+
+  'abbaabbba'
+  'a'
+  ...'a'
+  ....'a'
+  ........'a'
+
+'ab{3}?' (a followed by three b)
+
+  'abbaabbba'
+  ....'abbb'
+
+'ab{2,3}?' (a followed by two to three b)
+
+  'abbaabbba'
+  'abb'
+  ....'abb'
+

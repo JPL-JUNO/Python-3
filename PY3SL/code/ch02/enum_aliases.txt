@@ -1,0 +1,10 @@
+new             = 7
+incomplete      = 6
+invalid         = 5
+wont_fix        = 4
+in_progress     = 3
+fix_committed   = 2
+fix_released    = 1
+
+Same: by_design is wont_fix:  True
+Same: closed is fix_released:  True

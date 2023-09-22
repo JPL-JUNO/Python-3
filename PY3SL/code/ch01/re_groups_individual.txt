@@ -1,0 +1,5 @@
+Input text            : This is some text -- with punctuation
+Pattern               : (\bt\w+)\W+(\w+)
+Entire match          : text -- with
+Word starting with 't': text
+Word after 't' word   : with

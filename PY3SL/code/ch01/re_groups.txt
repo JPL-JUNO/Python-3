@@ -1,0 +1,29 @@
+'a(ab)' (a followed by literal ab)
+
+  'abbaaabbbbaaaaa'
+  ....'aab'
+
+'a(a*b*)' (a followed by 0-n a and 0-n b)
+
+  'abbaaabbbbaaaaa'
+  'abb'
+  ...'aaabbbb'
+  ..........'aaaaa'
+
+'a(ab)*' (a followed by 0-n ab)
+
+  'abbaaabbbbaaaaa'
+  'a'
+  ...'a'
+  ....'aab'
+  ..........'a'
+  ...........'a'
+  ............'a'
+  .............'a'
+  ..............'a'
+
+'a(ab)+' (a followed by 1-n ab)
+
+  'abbaaabbbbaaaaa'
+  ....'aab'
+
