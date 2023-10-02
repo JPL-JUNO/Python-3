@@ -1,0 +1,4 @@
+Text: 'Does this text match the pattern?'
+
+Seeking 'this' -> match!
+Seeking 'that' -> no match!

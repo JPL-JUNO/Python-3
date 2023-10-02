@@ -1,0 +1,35 @@
+There are several mathematics topics that are essential for understanding and working with artificial intelligence (AI). Here are some key mathematical areas and recommended books for each:
+
+1. **Linear Algebra:**
+   - **Book:** "Introduction to Linear Algebra" by Gilbert Strang.
+
+2. **Calculus:**
+   - **Book:** "Calculus" by James Stewart.
+
+3. **Probability and Statistics:**
+   - **Book:** "Introduction to Probability" by Joseph K. Blitzstein and Jessica Hwang.
+   - **Book:** "Mathematical Statistics with Applications" by Dennis Wackerly, William Mendenhall, and Richard L. Scheaffer.
+
+4. **Optimization:**
+   - **Book:** "Convex Optimization" by Stephen Boyd and Lieven Vandenberghe.
+
+5. **Differential Equations:**
+   - **Book:** "Elementary Differential Equations and Boundary Value Problems" by William E. Boyce and Richard C. DiPrima.
+
+6. **Information Theory:**
+   - **Book:** "Elements of Information Theory" by Thomas M. Cover and Joy A. Thomas.
+
+7. **Linear Programming:**
+   - **Book:** "Introduction to Linear Optimization" by Dimitris Bertsimas and John N. Tsitsiklis.
+
+8. **Numerical Methods:**
+   - **Book:** "Numerical Analysis" by Richard L. Burden and J. Douglas Faires.
+
+9. **Graph Theory:**
+   - **Book:** "Introduction to Graph Theory" by Richard J. Trudeau.
+
+10. **Machine Learning Mathematics:**
+    - **Book:** "Pattern Recognition and Machine Learning" by Christopher M. Bishop.
+    - **Book:** "Deep Learning" by Ian Goodfellow, Yoshua Bengio, and Aaron Courville.
+
+These books cover the mathematical foundations needed for AI and machine learning. Depending on your current level of mathematical knowledge and your specific interests within AI, you may need to start with the basics and work your way up to more advanced topics. Additionally, online courses and tutorials can complement your learning and provide practical applications of these mathematical concepts in AI.

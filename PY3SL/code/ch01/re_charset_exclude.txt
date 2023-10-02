@@ -1,0 +1,10 @@
+'[^-. ]+' (sequences without -, ., or space)
+
+  'This is some text -- with punctuation'
+  'This'
+  .....'is'
+  ........'some'
+  .............'text'
+  .....................'with'
+  ..........................'punctuation'
+

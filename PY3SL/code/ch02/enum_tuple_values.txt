@@ -1,0 +1,4 @@
+Name: BugStatus.in_progress
+Value: (3, ['new', 'fix_committed'])
+Custom attribute: ['new', 'fix_committed']
+Using attribute: True

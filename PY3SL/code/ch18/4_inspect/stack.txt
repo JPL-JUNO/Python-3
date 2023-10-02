@@ -1,0 +1,37 @@
+D:\DS_Works\Python-3\PY3SL\code\ch18\4_inspect\stack.py[14]
+  ->  for level in inspect.stack():
+{'level': FrameInfo(frame=<frame at 0x000001718675BA00, file 'D:\\DS_Works\\Python-3\\PY3SL\\code\\ch18\\4_inspect\\stack.py', line 21, code show_stack>, filename='D:\\DS_Works\\Python-3\\PY3SL\\code\\ch18\\4_inspect\\stack.py', lineno=14, function='show_stack', code_context=['    for level in inspect.stack():\n'], index=0, positions=Positions(lineno=14, end_lineno=14, col_offset=17, end_col_offset=32))}
+
+D:\DS_Works\Python-3\PY3SL\code\ch18\4_inspect\stack.py[28]
+  ->  show_stack()
+{'limit': 0, 'local_variable': ''}
+
+D:\DS_Works\Python-3\PY3SL\code\ch18\4_inspect\stack.py[30]
+  ->  recurse(limit - 1)
+{'limit': 1, 'local_variable': '.'}
+
+D:\DS_Works\Python-3\PY3SL\code\ch18\4_inspect\stack.py[30]
+  ->  recurse(limit - 1)
+{'limit': 2, 'local_variable': '..'}
+
+D:\DS_Works\Python-3\PY3SL\code\ch18\4_inspect\stack.py[35]
+  ->  recurse(2)
+{'__annotations__': {},
+ '__builtins__': <module 'builtins' (built-in)>,
+ '__cached__': None,
+ '__doc__': '\n'
+            '@Title: stack.py\n'
+            '@Author(s): Stephen CUI\n'
+            '@LastEditor(s): Stephen CUI\n'
+            '@CreatedTime: 2023-09-29 15:25:48\n'
+            '@Description: \n',
+ '__file__': 'D:\\DS_Works\\Python-3\\PY3SL\\code\\ch18\\4_inspect\\stack.py',
+ '__loader__': <_frozen_importlib_external.SourceFileLoader object at 0x0000017186698C90>,
+ '__name__': '__main__',
+ '__package__': None,
+ '__spec__': None,
+ 'inspect': <module 'inspect' from 'D:\\Python3.11.1\\Lib\\inspect.py'>,
+ 'pprint': <module 'pprint' from 'D:\\Python3.11.1\\Lib\\pprint.py'>,
+ 'recurse': <function recurse at 0x000001718699F240>,
+ 'show_stack': <function show_stack at 0x0000017186640680>}
+

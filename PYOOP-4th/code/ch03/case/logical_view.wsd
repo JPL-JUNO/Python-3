@@ -1,0 +1,37 @@
+@startuml Logical View
+skinparam Handwritten true
+
+
+class TrainingData{
+    name: str
+    uploaded: datetime.datetime
+    tested: datetime.datetime
+    load(source: Iterable)
+}
+
+
+class Sample{
+    sepal_length: float
+    sepal_width: float
+    petal_length: float
+    petal_width: float
+}
+class KnownSample {
+    species: str
+}
+class TrainingKnownSample {
+}
+
+class TestingKnownSample{
+    classifiction:str
+}
+class "List[TrainingKnownSample]"
+class "List[TestingKnownSample]"
+class "List[Hyperparameter]"
+
+TrainingData *---> "List[TrainingKnownSample]": training >
+
+Sample <|-- KnownSample
+KnownSample <|-- TrainingKnownSample
+KnownSample <|-- TestingKnownSample
+@enduml

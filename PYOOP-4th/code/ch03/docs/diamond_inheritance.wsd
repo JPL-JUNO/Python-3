@@ -1,0 +1,28 @@
+@startuml diamond_inheritance
+'figure 1: diamond diagram'
+skinparam Monochrome false
+skinparam Handwritten true
+skinparam Shadowing true
+' hide class circle
+' skinparam ClassAttributeFontSize 10
+
+class BaseClass{
+    + call_me()
+}
+
+class LeftSubclass{
+    + call_me()
+}
+
+class RightSubclass{
+    + call_me()
+}
+
+class SubClass{
+    + call_me()
+}
+BaseClass <|-- LeftSubclass
+BaseClass <|-- RightSubclass
+LeftSubclass <|-- SubClass
+RightSubclass <|-- SubClass
+@enduml

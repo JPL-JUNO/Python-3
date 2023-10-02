@@ -1,0 +1,7 @@
+\chapter{\label{ch18}}
+\section{inspect: Inspect Live Objects}
+The inspect module provides functions for learning about live objects, including modules, classes, instances, functions, and methods. The functions in this module can be used to retrieve the original source code for a function, look at the arguments to a method on the stack, and extract the sort of information useful for producing library documentation for source code.
+\subsection{检查模块}
+第一种对现场对象的检查是为了了解这些对象。Use getmembers() to discover the member attributes of objects. The types of members that might be returned depend on the type of object scanned. Modules can contain classes and functions, classes can contain methods and attributes, and so on.
+
+The arguments to getmembers() are an object to scan (a module, class, or instance) and an optional predicate function that is used to filter the objects returned. The return value is \textbf{a list of tuples} with two values: the name of the member and the type of the member. The inspect module includes several such predicate functions with names like ismodule(), isclass(), and so on.

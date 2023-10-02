@@ -1,0 +1,44 @@
+'^\w+' (word at start of string, excluding alphanumeric)
+
+  'This is some text -- with punctuation'
+  'This'
+
+'\A\w+' (word at start of sting)
+
+  'This is some text -- with punctuation'
+  'This'
+
+'\w+\S*$' (word near end of string)
+
+  'This is some text -- with punctuation'
+  ..........................'punctuation'
+
+'\w+\S*\Z' (word near end of string)
+
+  'This is some text -- with punctuation'
+  ..........................'punctuation'
+
+'\w*t\w*' (word containing t)
+
+  'This is some text -- with punctuation'
+  .............'text'
+  .....................'with'
+  ..........................'punctuation'
+
+'\bt\w+' (t at start fo word)
+
+  'This is some text -- with punctuation'
+  .............'text'
+
+'\w+t\b' (t an end of word)
+
+  'This is some text -- with punctuation'
+  .............'text'
+
+'\Bt\B' (t, not start or end of word)
+
+  'This is some text -- with punctuation'
+  .......................'t'
+  ..............................'t'
+  .................................'t'
+

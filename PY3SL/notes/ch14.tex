@@ -1,0 +1,22 @@
+\chapter{\label{ch14}}
+\section{logging: 报告状态、错误和信息消息}
+\subsection{日志系统的组成}
+The logging system consists of four interacting types of objects. Each module or application that wants to log some activity uses a Logger instance to add information to the logs. Invoking the logger creates a LogRecord, which holds the information in memory until it is processed. A Logger may have a number of Handler objects configured to receive and process log records. The Handler uses a Formatter to turn the log records into output messages.
+
+\begin{table}
+    \centering
+    \caption{}
+    \label{日志级别}
+    \begin{tabular}{cc}
+        \hline
+        级别       & 值  \\
+        \hline
+        CRITICAL & 50 \\
+        ERROR    & 40 \\
+        WARNING  & 30 \\
+        INFO     & 20 \\
+        DEBUG    & 10 \\
+        UNSET    & 0  \\
+        \hline
+    \end{tabular}
+\end{table}
