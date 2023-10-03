@@ -6,17 +6,17 @@
 
 ## 内容目录
 
-包含5个部分共24章：
+包含 5 个部分共 24 章：
 
 1. Data Structures
-   - The Python Data Model
-   - An Array of Sequences
-   - Dictionaries and Sets
-   - Unicode Text Versus Bytes
+   - [x] The Python Data Model
+   - [x] An Array of Sequences
+   - [x] Dictionaries and Sets
+   - [x] Unicode Text Versus Bytes
    - Data Class Builders
    - Object References, Mutability, and Recycling
 2. Functions as Objects
-   - Functions as First-Class Objects
+   - [x] Functions as First-Class Objects
    - Type Hints in Functions
    - Decorators and Closures
    - Design Patterns with First-Class Functions
