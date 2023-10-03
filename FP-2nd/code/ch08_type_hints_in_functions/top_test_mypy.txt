@@ -1,0 +1,6 @@
+top_test.py:34: note: Revealed type is "typing.Iterator[tuple[builtins.int, builtins.str]]"
+top_test.py:35: note: Revealed type is "builtins.list[tuple[builtins.int, builtins.str]]"
+top_test.py:36: note: Revealed type is "typing.Iterable[tuple[builtins.int, builtins.str]]"
+top_test.py:45: note: Revealed type is "builtins.list[builtins.object]"
+top_test.py:47: error: Value of type variable "LT" of "top" cannot be "object"  [type-var]
+Found 1 error in 1 file (checked 1 source file)

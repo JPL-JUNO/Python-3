@@ -1,0 +1,2 @@
+birds.py:33: error: "Bird" has no attribute "quack"  [attr-defined]
+Found 1 error in 1 file (checked 1 source file)

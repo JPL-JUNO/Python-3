@@ -1,0 +1,3 @@
+birds.py:33: error: "Bird" has no attribute "quack"  [attr-defined]
+woody.py:13: error: Argument 1 to "alert_duck" has incompatible type "Bird"; expected "Duck"  [arg-type]
+Found 2 errors in 2 files (checked 1 source file)

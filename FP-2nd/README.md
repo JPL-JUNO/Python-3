@@ -17,7 +17,7 @@
    - Object References, Mutability, and Recycling
 2. Functions as Objects
    - [x] Functions as First-Class Objects
-   - Type Hints in Functions
+   - [x] Type Hints in Functions
    - Decorators and Closures
    - Design Patterns with First-Class Functions
 3. Classes and Protocols
