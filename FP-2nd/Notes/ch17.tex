@@ -1,0 +1,29 @@
+\chapter{迭代器、生成器与经典协程\label{ch17}}
+\section{序列可以迭代的原因：iter 函数}
+解释器需要迭代对象 x 时，会自动调用 iter(x)。
+内置的 iter 函数执行以下操作：
+\begin{enumerate}
+    \item 检查对象是否实现了 \verb|__iter__| 方法，如果实现了就调用它，获取一个迭代器。
+    \item 如果没有实现 \verb|__iter__| 方法，但是实现了 \verb|__getitem__| 方法，Python 会创建一个迭代器，尝试按顺序（从索引 0 开始）获取元素。
+    \item 如果尝试失败，Python 抛出 TypeError 异常，通常会提示“C object is not iterable”（C对象不可迭代），其中 C 是目标对象所属的类。
+\end{enumerate}
+
+这是鸭子类型（duck typing）的极端形式：不仅实现了特殊方法的 \verb|__iter__| 的对象被视作可迭代对象，实现了 \verb|__getitem__| 方法的对象也被视作可迭代对象。
+
+If a class provides \verb|__getitem__|, the iter() built-in accepts an instance of that class as iterable and builds an iterator from the instance. Python’s iteration machinery will call \verb|__getitem__| with indexes starting from 0, and will take an IndexError as a signal that there are no more items. Although \verb|__getitem__| could provide items, it is not recognized as such by an isinstance against abc.Iterable.
+
+从 Python 3.10 开始，检查对象 x 能否迭代，最准确的方法是调用 iter() 函数，如果不可以迭代，则处理 TypeError 异常。This is more accurate than using isinstance(x,abc.Iterable), because iter(x) also considers the legacy \verb|__getitem__| method, while the Iterable ABC does not.
+\section{可迭代对象与迭代器}
+使用 iter 内置函数可以获取迭代器的对象。如果对象实现了能返回迭代器的 \verb|__iter__| 方法，那么对象就是可迭代的。序列都可以迭代；实现了 \verb|__getitem__| 方法，而且其参数是从 0 开始的索引，这种对象也可以迭代。
+
+我们要明确可迭代的对象和迭代器之间的关系：\textbf{Python 从可迭代的对象中获取迭代器}。
+
+Python 标准的迭代器接口有以下两个方法：
+\begin{enumerate}
+    \item \verb|__next__| 返回序列中的下一项，如果没有项了，则抛出 StopIteration 。
+    \item \verb|__iter__| 放回 self，以便在预期内可迭代对象的地方使用迭代器。
+\end{enumerate}
+
+\figures{fig17-1}{
+    Iterable 和 Iterator 抽象基类。以斜体显示的是抽象方法。具体的 \texttt{Iterable.\_\_iter\_\_} 方法应该返回一个 Iterator 实例。具体的 Iterator 类必须实现 \texttt{\_\_next\_\_} 方法。\texttt{Iterator.\_\_iter\_\_} 方法直接返回实例本身
+}
