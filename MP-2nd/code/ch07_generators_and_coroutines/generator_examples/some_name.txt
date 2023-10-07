@@ -1,0 +1,2 @@
+This will be written to 'some_name.txt' using ExitStack
+some_name took 0:00:00
