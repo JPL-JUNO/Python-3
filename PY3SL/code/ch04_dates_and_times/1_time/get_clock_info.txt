@@ -1,0 +1,35 @@
+process_time:
+    adjustable    :False
+    implementation:GetProcessTimes()
+    monotonic     : True
+    resolution    : 1e-07
+    current       : 0.0625
+
+monotonic:
+    adjustable    :False
+    implementation:GetTickCount64()
+    monotonic     : True
+    resolution    : 0.015625
+    current       : 21387.312
+
+perf_counter:
+    adjustable    :False
+    implementation:QueryPerformanceCounter()
+    monotonic     : True
+    resolution    : 1e-07
+    current       : 21387.5013713
+
+process_time:
+    adjustable    :False
+    implementation:GetProcessTimes()
+    monotonic     : True
+    resolution    : 1e-07
+    current       : 0.0625
+
+time:
+    adjustable    :True
+    implementation:GetSystemTimeAsFileTime()
+    monotonic     : False
+    resolution    : 0.015625
+    current       : 1696773146.3930852
+

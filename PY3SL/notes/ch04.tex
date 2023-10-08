@@ -1,0 +1,13 @@
+\chapter{日期和时间}
+不同于 int、float 和 str，Python 没有包含对应日期和时间的原生类型，不过提供了 3 个相应的模块，可以采用多种表示来管理日期和时间值。
+
+time 模块由底层 C 库提供与事件相关的函数。它包含一些函数，可以用于获取时钟时间和处理器运行时间，还提供了多种表示来管理日期和时间值。
+
+datetime 模块为日期、时间以及日期时间值提供了一个更高层接口。datetime 中的类支持算术、比较和时区设置。
+
+calendar 模块可以创建周、月和年的格式化表示。它还可以用来计算重复事件，给定日期是星期几，以及其他基于日历的值。
+\section{time: 时钟日期}
+The time module provides access to several types of clocks, each useful for different purposes. The standard system calls such as \verb|time()| report the system “wall clock” time. The \verb|monotonic()| clock can be used to measure elapsed time in a long-running process because it is guaranteed never to move backward, even if the system time is changed. For performance testing, \verb|perf_counter()| provides access to the clock with the highest available resolution, which makes short time measurements more accurate. The CPU time is available through \verb|clock()|, and \verb|process_time()| returns the combined processor time and system time.
+
+\section{datetime: 日期和时间值管理}
+\section{calendar: 处理日期}
