@@ -12,4 +12,20 @@ class Iterable:
 
 
 class Iterator(Iterable):
-    pass
+    __slots__ = {}
+
+    @abstractmethod
+    def __next__(self):
+        'return the next item from the iterator, when exhausted, raise StopIteration'
+        raise StopIteration
+
+    def __iter__(self):
+        return self
+
+    @classmethod
+    def __subclasshook__(cls, C):
+        # 为 isinstance 和 issubclass 所作的结构类型检查提供支持
+        if cls is Iterator:
+            # _check_methods() 遍历类的 __mro__ 属性，检查积累有没有实现指定的方法
+            return _check_methods(C, '__iter__', '__next__')
+        return NotImplemented
