@@ -22,7 +22,7 @@ def main(argv):
         module = importlib.import_module(module_name)
         gen_factory = getattr(module, 'ArithmeticProgression', None)
         if gen_factory is None:
-            gen_factory = getattr(module, 'artiprog_gen', None)
+            gen_factory = getattr(module, 'aritprog_gen', None)
         if gen_factory is None:
             continue
         test(gen_factory, verbose)
