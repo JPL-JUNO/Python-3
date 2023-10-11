@@ -22,4 +22,6 @@ class ArithmeticProgression:
         while forever or result < self.end:
             yield result
             index += 1
+            # 使用乘法来降低处理浮点数时累积效应致错的风险
+            # 简单实验：见 experiment.py
             result = self.begin+self.step*index
