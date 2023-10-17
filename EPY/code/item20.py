@@ -89,12 +89,12 @@ def careful_divide(a: float, b: float) -> float:
     except ZeroDivisionError as e:
         raise ValueError('Invalid inputs')
 
-# Functions that return None to indicate special meaning are error prone 
-# because None and other values (e.g., zero, the empty string) 
+# Functions that return None to indicate special meaning are error prone
+# because None and other values (e.g., zero, the empty string)
 # all evaluate to False in conditional expressions.
 
 # Raise exceptions to indicate special situations instead of returning None.
 # Expect the calling code to handle exceptions properly when they’re documented.
 
-# Type annotations can be used to make it clear that 
+# Type annotations can be used to make it clear that
 # a function will never return the value None, even in special situations.
