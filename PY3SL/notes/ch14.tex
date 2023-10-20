@@ -1,12 +1,12 @@
-\chapter{\label{ch14}}
+\chapter{应用构建模块\label{ch14}}
 \section{logging: 报告状态、错误和信息消息}
 \subsection{日志系统的组成}
 The logging system consists of four interacting types of objects. Each module or application that wants to log some activity uses a Logger instance to add information to the logs. Invoking the logger creates a LogRecord, which holds the information in memory until it is processed. A Logger may have a number of Handler objects configured to receive and process log records. The Handler uses a Formatter to turn the log records into output messages.
 
 \begin{table}
     \centering
-    \caption{}
-    \label{日志级别}
+    \caption{日志级别}
+    \label{loggingLevel}
     \begin{tabular}{cc}
         \hline
         级别       & 值  \\
@@ -20,3 +20,39 @@ The logging system consists of four interacting types of objects. Each module or
         \hline
     \end{tabular}
 \end{table}
+\section{configparser: 处理配置文件}
+Use the configparser module to manage user-editable configuration files for an application using a format similar to Windows INI files. The contents of the configuration files can be organized into groups and several option value types are supported, including integers, floating-point values, and booleans. Option values can be combined using Python formatting strings to build longer values such as URLs from shorter values such as host names and port numbers.
+\subsection{配置文件格式}
+The file format used by configparser is similar to the format used by older versions of Microsoft Windows. It consists of one or more named sections, each of which can contain individual options with names and values.
+
+The parser identifies config file sections by looking for lines starting with $[$ and ending with $]$. The value between the square brackets is the section name, and can contain any characters except square brackets.
+
+Options are listed one per line within a section. The line starts with the name of the option, which is separated from the value by a colon (:) or equal sign (=). Whitespace around the separator is ignored when the file is parsed.
+
+Lines starting with a semicolon (;) or an octothorpe ($\#$) are treated as comments. They are ignored when the contents of the configuration file are accessed programmatically.
+\subsubsection{读取配置文件}
+可以使用 Configparser 的 read 方法来读取配置文件。
+
+read 方法还接受一个文件名列表。依次检查这个列表中的各个名，如果文件存在，就打开并读取该文件。
+
+read 返回一个列表，其中包含成功加载的文件的名。通过检查这个列表，程序可以发现缺少哪些配置文件，并确定是将其忽略还是把这个条件当作一个错误。
+
+包含 Unicode 数据的配置文件应当使用适当的编码值来读取。
+
+\subsection{访问配置设置}
+ConfigParser 包含一些方法来检查所解析配置的结构，包括列出节和选项，以及得到它们的值。
+
+sections() 和 options() 会返回字符串列表，而 items() 返回一个元组列表，元组包含名 - 值对。
+
+ConfigParser 还支持与 dict 同样的映射 API，ConfigParser 相当于一个字典，其中包含对应各个节的不同字典。
+
+\paragraph{测试值是否存在} 要测试一个节是否存在，可以使用 \verb|has_section()|，并传入节名作为方法参数。在调用 get() 之前先测试一个节是否存在，这样可以避免因为缺少数据而导致产生异常。
+
+\verb|has_option()| 可以测试一个节中某个选项是否存在。如果节不存在，那么 \verb|has_option()|会返回 False。
+
+\paragraph{值类型} 所有节和选项名都被处理为字符串，不过选项值可以是字符串、整数、浮点数或者布尔值。可以用多个不同的字符串值表示配置文件中的布尔值；访问时它们会被自动转换为 True 或 False。ConfigParser 不会尝试去了解选项类型，而会希望应用使用正确的方法来获取所需类型的值。get() 总会返回一个字符串。使用 getint 可以得到整数，getfloat 得到浮点数，使用 getboolean 得到布尔值。
+
+可以在 ConfigParser 的 converters 参数中传入转换函数来增加定制类型转换器。每个转化器接受一个输入值，然后将他转换为适当的返回类型。增加转换器会让 ConfigParser 自动为这个类型创建一个获取方法，并使用 converters 中指定的类型名。还可以向 ConfigParser 的子类直接增加转换器方法。
+
+\paragraph{选项作为标志} 通常，解析器要求每个选项都有一个明确的值，不过如果 ConfigParser 参数 \verb|allow_no_value| 被设置为 True，那么选项可以在输入文件中单独作为一行，而且还可以被用作一个标志。选项没有明确的值时，\verb|get_option()|会报告这个选项存在，并且 get() 返回 None。
+\paragraph{多行字符串} 字符串值可以跨多行，前提是后面的行要缩进。在缩进的多行值中，空行会作为值得一部分保留。
