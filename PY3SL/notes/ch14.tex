@@ -56,3 +56,36 @@ ConfigParser 还支持与 dict 同样的映射 API，ConfigParser 相当于一�
 
 \paragraph{选项作为标志} 通常，解析器要求每个选项都有一个明确的值，不过如果 ConfigParser 参数 \verb|allow_no_value| 被设置为 True，那么选项可以在输入文件中单独作为一行，而且还可以被用作一个标志。选项没有明确的值时，\verb|get_option()|会报告这个选项存在，并且 get() 返回 None。
 \paragraph{多行字符串} 字符串值可以跨多行，前提是后面的行要缩进。在缩进的多行值中，空行会作为值得一部分保留。
+
+\subsection{修改设置}
+ConfigParser 主要通过从文件读取设置来进行配置，不过也可以填充设置，通过调用 \verb|add_section()| 来创建一个新的节，另外调用 set() 可以增加或修改一个选项。所有选项都被设置为字符串，即使它们将被获取为整数、浮点数或布尔值。
+
+可以分别用 \verb|remove_section()| 和 \verb|remove_option()| 从 ConfigParser 删除节和选项。删除一节也会删除其中包含得所有选项。
+
+\subsection{保存配置文件}
+用所需得数据填充 ConfigParser 后，就可以调用 write() 方法将它保存到一个文件。这种方法可以用来提供一个用于编辑设置得用户接口，而不需要编写任何代码来管理文件。
+
+\begin{tcolorbox}[title=警告]
+    读取、修改和重写配置文件时，原配置文件中的注释不会保留。
+\end{tcolorbox}
+
+\subsection{选项搜索路径}
+ConfigParser 查找选项时使用了一个多步搜索过程。开始搜索选项之前，首先会测试节点。如果这个节不存在，而且名不是特殊值 DEFAULT，则产生一个 NoSectionError 异常。
+\begin{enumerate}
+    \item 如果选项名出现在传递到 get() 的 vars 字典中，则会返回 vars 的值；
+    \item 如果选项名出现在指定的节中，则返回该节中的值；
+    \item 如果选项名出现在 DEFAULT 节中，则会返回相应的值；
+    \item 如果选项名出现在传递到构造函数的 defaults 字典中，则会返回相应的值；
+\end{enumerate}
+如果这个名未出现在以上任何位置，则产生 NoOptionError。
+
+\subsection{用拼接合并值}
+ConfigParser 提供了一个特性，名为拼接，可以将值结合在一起。如果值包含标准 Python 格式串，那么获取这个值时就会触发拼接特性。获取的值中指定的各个选项会按顺序一次被替换为相应的值，直到不再需要更多替换。
+
+\paragraph{使用默认值} 并不要求拼接的值出现在原选项所在的同一节中。默认值可以与覆盖值混合使用。
+
+\paragraph{替换错误} \verb|MAX_INTERPOLATION_DEPTH| 步骤之后替换停止，以避免递归引用导致的问题。如果有过多替换步骤，则会产生一个 InterpolationDepthError 异常。缺少值会导致一个 InterpolationMissingOptionError 异常。
+\paragraph{转义特殊字符} 由于拼接字符以 \% 开始，值中的字面量 \% 必须转义为 \%\%。
+
+\paragraph{拓展拼接} ConfigParser 通过 interpolation 参数来支持候选的拼接实现。interpolation 参数给定的对象要实现 Interpolation 类定义的 API。
+\paragraph{禁用拼接} 如果要禁用拼接，则应传入 None 而不是 Interpolation 对象。
