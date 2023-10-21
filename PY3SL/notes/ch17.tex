@@ -1,0 +1,31 @@
+\chapter{}
+\section{platform: 系统版本信息}
+尽管 Python 通常被用作一个跨平台的语言，但是有时还是有必要知道程序在哪种系统上运行。构建工具需要这个信息，另外应用可能也需要直到它使用的一些库或外部命令在不同操作系统上有不同的接口。
+
+\subsection{解释器}
+\verb|python_version()|和\verb|python_version_tuple()|可以返回不同形式的解释器版本，包括主版本、次版本和补丁级组件。\verb|python_compiler()|会报告构建解释器所用的编译器。\verb|python_build()| 将给出解释器构建的版本串。
+
+\subsection{平台}
+platform() 函数返回一个字符串，其中包含一个通用的平台标识符。这个函数接受两个可选的布尔参数。如果 aliased 为 True，则返回值中的名为会从一个正式名转换为更常用的格式。如果 terse 为 True，则会返回一个最小值，即取出某些部分，而不是返回完整的串。
+
+\subsection{操作系统和硬件信息}
+uname() 返回一个元组，其中包含系统、节点、发行号、版本、机器和处理器值。可以通过同名的函数访问各个值，比如表所列。
+\begin{table}
+    \centering
+    \caption{平台信息函数}
+    \label{tbl17.3}
+    \begin{tabular}{cc}
+        \hline
+        Function    & Return Value                   \\
+        \hline
+        system()    & 操作系统名                          \\
+        node()      & 服务器主机名，不是完全限定名                 \\
+        release()   & 操作系统发行号                        \\
+        version()   & 更详细的系统版本信息                     \\
+        machine()   & 硬件类型标识符，如 'i386'               \\
+        processor() & 处理器实际标识符（有些情况下与 machine() 值相同） \\
+        \hline
+    \end{tabular}
+\end{table}
+\subsection{可执行程序体系结构}
+可以使用 architecture() 函数查看程序的体系结构信息。第一个参数是可执行程序的路径（默认为 sys.executable，即 Python 解释器）。返回值是一个元组，包含位体系结构和使用的链接格式）。
