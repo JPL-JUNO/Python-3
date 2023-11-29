@@ -10,4 +10,38 @@ calendar 模块可以创建周、月和年的格式化表示。它还可以用�
 The time module provides access to several types of clocks, each useful for different purposes. The standard system calls such as \verb|time()| report the system “wall clock” time. The \verb|monotonic()| clock can be used to measure elapsed time in a long-running process because it is guaranteed never to move backward, even if the system time is changed. For performance testing, \verb|perf_counter()| provides access to the clock with the highest available resolution, which makes short time measurements more accurate. The CPU time is available through \verb|clock()|, and \verb|process_time()| returns the combined processor time and system time.
 
 \section{datetime: 日期和时间值管理}
+\begin{table}
+    \caption{strptime/strftime 格式化代码}
+    \centering
+    \begin{tabular}{rll}
+        \hline
+        Symbol & Meaning                                             & Example                    \\
+        \hline
+        \%a    & 缩写的星期                                               & 'Wed'                      \\
+        \%A    & 完整的星期                                               & 'Wednesday'                \\
+        \%w    & Weekday number: 0 (Sunday) through 6 (Saturday)     & '3'                        \\
+        \%d    & Day of the month (zero padded)                      & '13'                       \\
+        \%b    & Abbreviated month name                              & 'Jan'                      \\
+        \%B    & Full month name                                     & 'January'                  \\
+        \%m    & Month of the year                                   & '01'                       \\
+        \%y    & Year without century                                & '16'                       \\
+        \%Y    & Year with century                                   & '2016'                     \\
+        \%H    & Hour from 24-hour clock                             & '17'                       \\
+        \%I    & Hour from 12-hour clock                             & '05'                       \\
+        \%p    & AM/PM                                               & 'PM'                       \\
+        \%M    & Minutes                                             & '00'                       \\
+        \%S    & Seconds                                             & '00'                       \\
+        \%f    & Microseconds                                        & '000000'                   \\
+        \%z    & UTC offset for time zone–aware objects              & '-0500'                    \\
+        \%Z    & Time zone name                                      & 'EST'                      \\
+        \%j    & Day of the year                                     & '013'                      \\
+        \%W    & Week of the year                                    & '02'                       \\
+        \%c    & Date and time representation for the current locale & 'Wed Jan 13 17:00:00 2016' \\
+        \%x    & Date representation for the current locale          & '01/13/16'                 \\
+        \%X    & Time representation for the current locale          & '17:00:00'                 \\
+        \%\%   & A literal \% character                              & '\%'                       \\
+        \hline
+    \end{tabular}
+
+\end{table}
 \section{calendar: 处理日期}
