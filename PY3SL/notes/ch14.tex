@@ -1,4 +1,10 @@
 \chapter{应用构建模块\label{ch14}}
+\section{argparse: 命令行选项和参数解析}
+argparse 模块包含一些工具来构建命令行参数和选项处理器。
+\subsection{建立解析器}
+使用 argparse 的第一步是创建一个解析器对象，并告诉它需要什么参数。程序运行时可以使用这个解析器处理命令行参数。解析器类（ArgumentParser）的构造函数可以取多个参数，来建立程序帮助文本中使用的描述以及其他全局行为或设置。
+\subsection{定义参数}
+\subsection{解析命令行}
 \section{logging: 报告状态、错误和信息消息}
 \subsection{日志系统的组成}
 The logging system consists of four interacting types of objects. Each module or application that wants to log some activity uses a Logger instance to add information to the logs. Invoking the logger creates a LogRecord, which holds the information in memory until it is processed. A Logger may have a number of Handler objects configured to receive and process log records. The Handler uses a Formatter to turn the log records into output messages.
