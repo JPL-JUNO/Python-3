@@ -23,4 +23,5 @@ def more(text, num_lines=15):
 if __name__ == "__main__":
     import sys
 
-    more(open(sys.argv[1]).read(), 10)
+    # 在命令行输入的用于启动程序文本将出现在 Python 内置列表 sys.argv 之中
+    more(open(sys.argv[1], encoding="utf-8").read(), 10)
