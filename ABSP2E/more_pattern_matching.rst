@@ -113,3 +113,127 @@ True
 >>> mo2.group()
 'HaHaHa'
 >>>
+
+>>> phone_num_regex = re.compile(r"\d\d\d-\d\d\d-\d\d\d\d")
+>>> mo = phone_num_regex.search('Cell" 415-555-9999 Work: 212-555-0000')
+>>> mo.group()
+'415-555-9999'
+>>>
+
+>>> phone_num_regex = re.compile(r"\d\d\d-\d\d\d-\d\d\d\d")  # has no groups
+>>> phone_num_regex.findall('Cell" 415-555-9999 Work: 212-555-0000')
+['415-555-9999', '212-555-0000']
+>>> 
+
+>>> phone_num_regex = re.compile(r"(\d\d\d)-(\d\d\d)-(\d\d\d\d)")  # has groups
+>>> phone_num_regex.findall('Cell" 415-555-9999 Work: 212-555-0000')
+[('415', '555', '9999'), ('212', '555', '0000')]
+>>> 
+
+>>> xmas_regex = re.compile(r"\d+\s\w+")
+>>> xmas_regex.findall("12 drummers,8 maids, 7 swans, 6 geese")
+['12 drummers', '8 maids', '7 swans', '6 geese']
+>>> 
+
+>>> vowel_regex = re.compile(r"[aeiouAEIOU]")
+>>> vowel_regex.findall("RoboCop eats")
+['o', 'o', 'o', 'e', 'a']
+>>> 
+
+>>> constant_regex = re.compile(r"[^aeiouAEIOU]")
+>>> constant_regex.findall("RoboCop eats")
+['R', 'b', 'C', 'p', ' ', 't', 's']
+>>> 
+
+>>> begins_with_hello = re.compile(r"^Hello")
+>>> begins_with_hello.search("Hello, world!")
+<re.Match object; span=(0, 5), match='Hello'>
+>>> begins_with_hello.search("He said hello.") == None
+True
+>>> 
+
+
+>>> end_with_number = re.compile(r"\d$")
+>>> end_with_number.search("Your number is 42")
+<re.Match object; span=(16, 17), match='2'>
+>>> end_with_number.search("Your number is forty two.") == None
+True
+>>>
+
+>>> whole_string_num = re.compile(r"^\d+$")
+>>> whole_string_num.search("1234567890")
+<re.Match object; span=(0, 10), match='1234567890'>
+>>> whole_string_num.search("12345xyz67890") == None
+True
+>>> whole_string_num.search("12 2345678") == None
+True
+>>>
+
+>>> at_regex = re.compile(r".at")
+>>> at_regex.findall("The cat in the hat sat on the flat mat.")
+['cat', 'hat', 'sat', 'lat', 'mat']
+
+>>> name_regex = re.compile(r"First Name: (.*) Last Name: (.*)")
+>>> mo = name_regex.search("First Name: Al Last Name: Sweigart")
+>>> mo.group(1)
+'Al'
+>>> mo.group(2)
+'Sweigart'
+>>>
+
+>>> greedy_regex = re.compile(r"<.*>")
+>>> mo = greedy_regex.search("<To serve man> for dinner.>")
+>>> mo.group()
+'<To serve man> for dinner.>'
+>>>
+
+>>> no_new_line_regex = re.compile(".*")
+>>> mo = no_new_line_regex.search("Serve the public trust.\nProtect the innocent\n")
+>>> mo.group()
+'Serve the public trust.'
+>>>
+>>> new_line_regex = re.compile(".*", re.DOTALL)
+>>> mo = new_line_regex.search("Serve the public trust.\nProtect the innocent\n")
+>>> mo.group()
+'Serve the public trust.\nProtect the innocent\n'
+>>>
+
+>>> robocop = re.compile(r"robocop", re.I)
+>>> robocop.search("RoboCop is part man, part machine, all cop.").group()
+'RoboCop'
+>>> robocop.search("ROBOCOP protects the innocent.").group()
+'ROBOCOP'
+>>> robocop.search("Al, why does your programming book talk about robocop so much?").group()
+'robocop'
+>>>
+
+>>> names_regex = re.compile(r"Agent \w+")
+>>> names_regex.sub("CENSORED", "Agent Alice gave the secret documents to Agent Bob.")
+'CENSORED gave the secret documents to CENSORED.'
+>>>
+
+>>> agent_names_regex = re.compile(r"Agent (\w)\w+")
+>>> agent_names_regex.sub(r"\1****", "Agent Alice gave the secret documents to Agent Bob.")
+'A**** gave the secret documents to B****.'
+>>> 
+
+>>> phone_regex = re.compile(
+...     r"((\d{3}|\(\d{3}\))?(\s|-|\.)?\d{3}(\s|-|\.)\d{4}(\s*(ext|x|ext.)\s*\d{2,5})?)"
+... )
+>>>
+>>> phone_regex = re.compile(
+...     r"""(
+...     (\d{3}|\(\d{3}\))?# area code
+...     (\s|-|\.)?# separator
+...     \d{3}# first 3 digits
+...     (\s|-|\.)?# separator
+...     \d{4} # last 4 digits
+...     (\s*(ext|x|ext.)\s*\d{2,5})? # extension
+...     )""",
+...     re.VERBOSE,
+... )
+>>>
+
+>>> some_regex_value = re.compile(r"foo", re.IGNORECASE | re.DOTALL)
+>>> some_regex_value = re.compile(r"foo", re.IGNORECASE | re.DOTALL | re.VERBOSE)
+>>>
