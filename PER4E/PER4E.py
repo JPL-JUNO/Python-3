@@ -12,7 +12,7 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 st.title("Python 参考指南 4E")
-
+st.markdown("### :rainbow[Stephen CUI]")
 st.markdown(
     """
     1. Python 语言

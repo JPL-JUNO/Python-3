@@ -4,7 +4,7 @@
 @LastEditor(s): Stephen CUI
 @CreatedTime  : 2024-02-20 20:26:52
 @Email        : cuixuanstephen@gmail.com
-@Description  : 
+@Description  : 函数与函数式编程
 """
 
 import streamlit as st
@@ -124,55 +124,317 @@ with tabs[2]:
         ```
         """
     )
-st.markdown(
-    """
-    函数在 Python 中是头等对象。也就是说可以把它们当作参数传递给其他函数，放在数据结构中，以及作为函数的返回结果。
-    
-    将组成函数的语句和这些语句的执行环境打包在一起时，得到的对象称为闭包 。事实上所有函数都拥有一个指向了定义该函数的全局命名空间的 `__globals__` 属性。
-    
-    使用嵌套函数时，闭包将捕捉内部函数执行所需的整个环境。如果要编写惰性求值（lazy evaluation）或延迟求值的代码，闭包和嵌套函数特别有用。
-    
-    ```python
-    def call_func(func):
-        return func()
+with tabs[3]:
+    st.markdown(
+        """
+        函数在 Python 中是头等对象。也就是说可以把它们当作参数传递给其他函数，放在数据结构中，以及作为函数的返回结果。
 
-    def bar():
-        x = 13
-        def hello_world():
-            return f"Hello World. x is {x:d}"
-        return call_func(hello_world) # 'Hello World. x is 13'
-    ```
+        将组成函数的语句和这些语句的执行环境打包在一起时，得到的对象称为闭包 。事实上所有函数都拥有一个指向了定义该函数的全局命名空间的 `__globals__` 属性。
     
-    ```python
-    from urllib.request import urlopen
-    def page(url):
-        def get():
-            return urlopen(url).read()
-        return get
+        使用嵌套函数时，闭包将捕捉内部函数执行所需的整个环境。如果要编写惰性求值（lazy evaluation）或延迟求值的代码，闭包和嵌套函数特别有用。
+    
+        ```python
+        def call_func(func):
+            return func()
+            
+        def bar():
+            x = 13
+            def hello_world():
+                return f"Hello World. x is {x:d}"
+            return call_func(hello_world) # 'Hello World. x is 13'
+        ```
+    
+        ```python
+        from urllib.request import urlopen
+        def page(url):
+            def get():
+                return urlopen(url).read()
+            return get
+
+        python = page("http://www.python.org")
+        jython = page("http://www.jython.org")
+        jython, python
+        # (<function page.<locals>.get at 0x000001DD2A084180>, <function page.<locals>.get at 0x000001DD2A084400>)
+        py_data = python()
+        jy_data = jython()
+        ```
+
+        在这个例子中，`page` 函数实际上并不执行任何有意义的计算。相反，它只会创建和返回函数 `get`，调用该函数时会获取 `url` 页面的内容。    因此，`get` 函数中执行的计算实际上延迟到了程序后面对 `get` 求值的时候。
+        ```python
+        python.__closure__ # (<cell at 0x000001DD2A0815D0: str object at 0x000001DD2A07C490>,)
+        python.__closure__[0].cell_contents # http://www.jython.org
+        ```
+        如果需要在一系列函数调用中保持某个状态，使用闭包是一种非常高效的方式。
+
+        ```python
+        def count_down(n):
+            def next_one():
+                nonlocal n
+                r = n
+                n -= 1
+                return r
+
+            return next_one
+
+
+        next_one = count_down(10)
+        while True:
+            v = next_one()
+            if not v:
+                break
+        ```
+        在这段代码中，闭包用于保存内部计数器的值 `n`。每次调用内部函数 `next_one` 时，它都更新并返回这个计数器变量的前一个值。
+        """
+    )
+
+with tabs[4]:
+    st.write(
+        "装饰器是一个函数，其主要用途是包装另一个函数或类。这种包装的首要目的是光明正大地修改或增强被包装对象的行为。语法上使用 特殊符号 @ 表示装饰器。使用装饰器时，它们必须出现在函数或类定义之前的单独行上。可以同时使用多个装饰器。装饰器将按照它们出现的先后顺序应用。"
+    )
+    st.markdown(
+        """
+        ```python
+        enable_tracing = True
+        if enable_tracing:
+            debug_log = open("debug.log", "w")
+
+
+        def trace(func):
+            if enable_tracing:
+
+                def call_func(*args, **kwargs):
+                    debug_log.write(f"Calling {func.__name__}: {args}, {kwargs}\\n")
+                    r = func(*args, **kwargs)
+                    debug_log.write(f"{func.__name__} returned {r}\\n")
+                    return r
+
+                return call_func
+            else:
+                return func
+
+
+        @trace
+        def square(x):
+            return x * x
+
+
+        square(3)
+        # square = trace(square)
+        debug_log.close()
+        """
+    )
+    st.write(
+        """
+        `trace` 创建了一个包装器函数，它会写入一些调试输出，然后调用原始函数对象。因此如果调用 `square` 函数，看到的将是包装器中 `write` 方法的输出。trace` 函数返回的函数 `call_func` 是一个闭包，用于替换原始的函数。
+        """
+    )
+    st.markdown(
+        """
+        装饰器也可以接受参数。
         
-    python = page("http://www.python.org")
-    jython = page("http://www.jython.org")
-    jython, python
-    # (<function page.<locals>.get at 0x000001DD2A084180>, <function page.<locals>.get at 0x000001DD2A084400>)
-    py_data = python()
-    jy_data = jython()
-    ```
-    
-    在这个例子中，`page` 函数实际上并不执行任何有意义的计算。相反，它只会创建和返回函数 `get`，调用该函数时会获取 `url` 页面的内容。因此，`get` 函数中执行的计算实际上延迟到了程序后面对 `get` 求值的时候。
-    ```python
-    python.__closure__ # (<cell at 0x000001DD2A0815D0: str object at 0x000001DD2A07C490>,)
-    python.__closure__[0].cell_contents # http://www.jython.org
-    ```
-    如果需要在一系列函数调用中保持某个状态，使用闭包是一种非常高效的方式。
-    """
-)
+        ```python
+        event_handlers = {}
 
 
-from urllib.request import urlopen
+        def event_handler(event):
+            def register_function(f):
+                event_handlers[event] = f
+                return f
+
+            return register_function
 
 
-def page(url):
-    def get():
-        return urlopen(url).read()
+        @event_handler("Button")
+        def handle_button(msg):
+            pass
+        # temp = event_handler('Button')
+        # handle_button =  temp(handle_button)
 
-    return get
+
+        @event_handler("Reset")
+        def handle_reset(msg):
+            pass
+        ```
+        
+        装饰器也可以应用于类定义。对于类装饰器，应该让装饰器函数始终返回类对象作为结果。需要使用原始类定义的代码可能要直接引用类成员。
+        """
+    )
+with tabs[5]:
+    st.write(
+        """
+        函数使用 `yield` 关键字可以定义生成器 对象。生成器是一个函数，它生成一个值的序列，以便在迭代中使用。
+        """
+    )
+    st.code(
+        """
+        >>> def count_down(n):
+        ...     print(f"Counting down from {n:d}")
+        ...     while n > 0:
+        ...         yield n
+        ...         n -= 1
+        ...     return
+        ... 
+        >>> c = count_down(10)
+        >>> c
+        <generator object count_down at 0x000001DD29E60F20>
+        """
+    )
+    st.markdown(
+        """
+        如果调用该函数，就会发现其中的代码不会开始执行，相反它会返回一个生成器对象。
+        ```python
+        >>> next(c)
+        Counting down from 10
+        10
+        >>> next(c)
+        9
+        >>>
+        ```
+        
+        生成器对象就会在 `next()` 被调用（在 Python 3 中是 `__next__()` ）时执行函数。调用 `next()` 时，生成器函数将开始执行语句，直至遇到 `yield` 语句为止。`yield` 语句在函数执行停止的地方生成一个结果，直到再次调用 `next()` 。然后继续执行 `yield` 之后的语句。
+
+        通常不会在生成器上直接调用 `next()` 方法，而是通过 `for` 语句、`sum()` 或一些消耗序列的其他操作使用生成器，即不会手动去迭代。
+        
+        生成器函数完成的标志是返回或引发 `StopIteration` 异常，这标志着迭代的结束。如果生成器在完成时返回 `None` 之外的值，都是不合法的。(:orange[我觉得是可以返回其他值的])
+        
+        生成器使用时存在一个棘手的问题，即生成器函数仅被部分消耗。例如：
+        
+        ```python
+        for n in count_down(10):
+            if n == 2: 
+                break
+            pass
+        ```
+        
+        为了处理这种情况，生成器对象提供方法 `close()` 标识关闭。不再使用或删除生成器时，就会调用 `close()` 方法。通常不必手动调用 `close()` 方法，但也可以这么做。
+        
+        ```python
+        >>> c = count_down(10)
+        >>> c.__next__()
+        Counting down from 10
+        10
+        >>> c.__next__()
+        9
+        >>> c.close()
+        >>> c.__next__()
+        Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+        StopIteration
+        >>>
+        ```
+        
+        在生成器函数内部，在 `yield` 语句上出现 `GeneratorExit` 异常时就会调用 `close()` 方法。也可以选择捕捉这个异常，以便执行清理操作。虽然可以捕捉 `GeneratorExit` 异常，但对于生成器函数而言，使用 `yield` 语句处理异常并生成另一个输出值是不合法的。另外，如果程序当前正在对生成器进行迭代，不应通过另一个的执行线程或从信号处理程序异步调用该生成器上的 `close()` 方法。
+        
+        ```python
+        >>> def count_down(n):
+        ...     print(f"Counting down from {n:d}")
+        ...     try:
+        ...         while n > 0:
+        ...             yield n
+        ...             n -= 1
+        ...     except GeneratorExit:
+        ...         print(f"Only made it to {n:d}")
+        ...
+        >>> c = count_down(5)
+        >>> next(c)
+        Counting down from 5
+        5
+        >>> next(c)
+        4
+        >>> c.close()
+        Only made it to 4
+        >>>
+        ```
+        """
+    )
+with tabs[6]:
+    st.markdown(
+        """
+        在函数内，`yield` 语句还可以作为表达式使用，出现在赋值运算符的右边。以这种方式使用 `yield` 语句的函数称为**协程** ，向函数发送值时函数将执行。
+        
+        ```python
+        >>> def receiver():
+        ...     print("Ready to receive")
+        ...     while True:
+        ...         n = yield
+        ...         print(f"Got {n}")
+        ...
+        >>> r = receiver()
+        >>> next(r)
+        Ready to receive
+        >>> r.send(1)
+        Got 1
+        >>> r.send(2)
+        Got 2
+        >>> r.send("Hello")
+        Got Hello
+        >>>
+        ```
+        
+        在这个例子中，一开始调用 `next()` 是必不可少的，这样协程才能执行第一个 `yield` 表达式之前的语句。这时，协程会挂起，等待相关生成器对象 `r` 的 `send()` 方法给它发送一个值。传递给 `send()` 的值由协程中的 `(yield)` 表达式返回。接收到值后，协程就会执行语句，直至遇到下一条 `yield` 语句。
+
+        在协程中需要首先调用 `next()` 这件事情很容易被忽略，这经常成为错误出现的原因。因此，建议使用一个能自动完成该步骤的装饰器来包装协程。
+        ```python
+        >>> def coroutine(func):
+        ...     def start(*args, **kwargs):
+        ...         g = func(*args, **kwargs)
+        ...         next(g)
+        ...         return g
+        ...     return start
+        ...
+        >>> 
+        >>> @coroutine
+        ... def receiver():
+        ...     print("Ready to receive")
+        ...     while True:
+        ...         n = yield
+        ...         print(f"Got {n}")
+        ...
+        >>>
+        ```
+        协程一般会不断地执行下去，除非被显式关闭或者自己退出。关闭后，如果继续给协程发送值，就会引发 `StopIteration` 异常。`close()` 操作将在协程内部引发 `GeneratorExit` 异常。
+        ```python
+        >>> r.close()
+        >>> r.send(4)
+        Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+        StopIteration
+        >>>
+        ```
+        
+        可以使用 `throw(exctype[, value [, tb]])` 方法在协程内部引发异常，其中 `exctype` 是指异常类型， `value` 是指异常的值，而 `tb` 是指跟踪对象。
+        
+        ```python
+        >>> r.throw(RuntimeError, "You're hosed!") 
+        Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+        RuntimeError: You're hosed!
+        >>>
+        ```
+        以这种方式引发的异常将在协程中当前执行的 `yield` 语句处出现。协程可以选择捕捉异常并以正确方式处理它们。使用 `throw()` 方法作为给协程的异步信号并不安全——永远都不应该通过单独的执行线程或信号处理程序调用这个方法。
+        
+        如果 `yield` 表达式中提供了值，协程可以使用 `yield` 语句同时接收和发出返回值。
+        
+        ```python
+        >>> def line_splitter(delimiter=None):
+        ...     print("Ready to split")
+        ...     result = None
+        ...     while True:
+        ...         line = yield result
+        ...         result = line.split(delimiter)
+        ...
+        >>> s = line_splitter(",")
+        >>> next(s)
+        Ready to split
+        >>> s.send("A,B,C")
+        ['A', 'B', 'C']
+        >>> s.send("100,200,300")
+        ['100', '200', '300']
+        >>>
+        ```
+        
+        理解这个例子中的先后顺序至关重要。首个 `next()` 调用让协程向前执行到(`yield result`) ，这将返回 `result` 的初始值 `None` 。在接下来的 `send()` 调用中，接收到的值被放在 `line` 中并拆分到 `result` 中。`send()` 方法的返回值就是传递给下一条 `yield` 语句的值。换句话说，`send()` 方法的返回值来自下一个 `yield` 表达式，而不是接收 `send()` 传递的值的 `yield` 表达式。
+        
+        如果协程返回值，需要小心处理使用 `throw()` 引发的异常。如果使用 `throw()` 在协程中引发一个异常，传递给协程中下一条 `yield` 语句的值将作为 `throw()` 方法的结果返回。如果需要这个值却又忘记保存它，它就会消失不见。
+        """
+    )
