@@ -125,4 +125,27 @@ with tabs[0]:
     """
     )
 with tabs[1]:
-    pass
+    st.markdown(
+        """
+        ```python
+        >>> import os.path
+        >>>
+        ```
+        要将多个路径组件组合成一个值，请使用 `join()`。
+        ```python
+        >>> PATHS = [
+        ...     ("one", "two", "three"),
+        ...     ("/", "one", "two", "three"),
+        ...     ("/one", "/two", "/three"),
+        ... ]
+        >>> for parts in PATHS:
+        ...     print(f"{parts} : {os.path.join(*parts)!r}")
+        ...
+        ('one', 'two', 'three') : 'one\\\\two\\\\three'
+        ('/', 'one', 'two', 'three') : '/one\\\\two\\\\three'
+        ('/one', '/two', '/three') : '/three'
+        >>>
+        ```
+        如果 `join` 的某个参数以 `os.sep` 开头，则所有前面的参数都将被丢弃，该参数将成为返回值的开头。
+        """
+    )
