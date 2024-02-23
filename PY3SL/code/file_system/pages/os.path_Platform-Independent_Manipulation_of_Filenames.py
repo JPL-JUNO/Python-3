@@ -121,7 +121,6 @@ with tabs[0]:
         PREFIX: \one\\two
         >>>
         ```
-        
     """
     )
 with tabs[1]:
@@ -147,5 +146,99 @@ with tabs[1]:
         >>>
         ```
         如果 `join` 的某个参数以 `os.sep` 开头，则所有前面的参数都将被丢弃，该参数将成为返回值的开头。
+        
+        还可以使用包含可自动扩展的“可变”组件的路径。 例如，`expanduser()` 将波形符 (~) 字符转换为用户主目录的名称。
+        
+        ```python
+        >>> for user in ["", "stephen", "nosuchuser"]:
+        ...     lookup = "~" + user
+        ...     print(f"{lookup!r:>15} : {os.path.expanduser(lookup)!r}")
+        ... 
+                    '~' : 'C:\\Users\\JPL-JUNO'
+             '~stephen' : 'C:\\Users\\stephen'
+          '~nosuchuser' : 'C:\\Users\\nosuchuser'
+        >>> 
+        ```
+        如果找不到用户的主目录，则字符串原样返回。
+        
+        `expandvars()` 更通用，它扩展路径中存在的任何 `shell` 环境变量。
+        ```python
+        >>> os.environ["MYVAR"] = "VALUE"
+        >>> os.path.expandvars("/path/to/$MYVAR")
+        '/path/to/VALUE
+        ```
+        不执行任何验证来确保变量值产生的文件名已存在。
         """
+    )
+with tabs[2]:
+    st.markdown(
+        """
+        ```python
+        >>> import os.path
+        >>>
+        ```
+        使用 `join()` 或嵌入变量从单独的字符串组装的路径可能最终会带有额外的分隔符或相对路径组件。 使用 `normpath()` 来清理它们。
+
+        ```python
+        >>> PATHS = [
+        ...     "one//two//three",
+        ...     "one/./two/./three",
+        ...     "one/../alt/two/three",
+        ... ]
+        >>> for path in PATHS:
+        ...     print(f"{path!r:>22} : {os.path.normpath(path)}")
+        ...
+             'one//two//three' : one\\two\\three
+           'one/./two/./three' : one\\two\\three
+        'one/../alt/two/three' : alt\\two\\three
+        >>>
+        ```
+        由 `os.curdir` 和 `os.pardir` 组成的路径段被评估并折叠。
+        
+        要将相对路径转换为绝对文件名，使用 `abspath()`。
+        
+        ```python
+        >>> os.chdir(os.path.expanduser("~"))
+        >>> PATHS = [
+        ...     ".",
+        ...     "..",
+        ...     "./one/two/three",
+        ...     "../one/two/three",
+        ... ]
+        >>> for path in PATHS:
+        ...     print(f"{path!r:>21} : {os.path.abspath(path)!r}")
+        ...
+                          '.' : 'C:\\Users\\JPL-JUNO'
+                         '..' : 'C:\\Users'
+            './one/two/three' : 'C:\\Users\\JPL-JUNO\\one\\two\\three'
+           '../one/two/three' : 'C:\\Users\\one\\two\\three'
+        >>>
+        ```
+      """
+    )
+
+with tabs[3]:
+    st.markdown(
+        """
+        ```python
+        import os.path
+        import time
+        ```
+        除了使用路径之外，`os.path` 还包括用于检索文件属性的函数，类似于 `os.stat()` 返回的函数。
+        ```python
+        print("File         :", __file__)
+        print("Access time  :", time.ctime(os.path.getatime(__file__)))
+        print("Modified time:", time.ctime(os.path.getmtime(__file__)))
+        print("Change time  :", time.ctime(os.path.getctime(__file__)))
+        print("Size         :", os.path.getsize(__file__))
+        ```
+        
+        `os.path.getatime() `返回访问时间，`os.path.getmtime()` 返回修改时间，`os.path.getctime()` 返回创建时间。 `os.path.getsize()` 返回文件中的数据量，以字节表示。
+  """
+    )
+with tabs[4]:
+    st.markdown(
+        """
+        当程序遇到路径名时，通常需要知道该路径是否引用文件、目录或符号链接以及是否存在。`os.path` 包含用于测试所有这些条件的函数。
+  """
     )
