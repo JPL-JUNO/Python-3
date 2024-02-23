@@ -240,5 +240,21 @@ with tabs[4]:
     st.markdown(
         """
         当程序遇到路径名时，通常需要知道该路径是否引用文件、目录或符号链接以及是否存在。`os.path` 包含用于测试所有这些条件的函数。
+        
+        ```python
+        import os.path
+
+        FILENAMES = [__file__, os.path.dirname(__file__), "/", "./broken_link"]
+        for file in FILENAMES:
+            print(f"File:{file!r}")
+            print(f"Absolute    :", os.path.isabs(file))
+            print(f"Is File     :", os.path.isfile(file))
+            print(f"Is Dir      :", os.path.isdir(file))
+            print(f"Is Link?    :", os.path.islink(file))  # 判断一个路径是否是软链
+            print(f"Mountpoint? :", os.path.ismount(file))
+            print(f"Exists?     :", os.path.exists(file))
+            print(f"Link Exists?:", os.path.lexists(file))
+            print()
+        ```
   """
     )
