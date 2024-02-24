@@ -23,7 +23,7 @@ tabs = st.tabs(
         "建立路径",
         "解析路径",
         "创建具体路径",
-        "目录类容",
+        "目录内容",
         "读写文件",
         "管理目录和符号链接",
         "文件类型",
@@ -228,5 +228,67 @@ with tabs[4]:
     ..\\source\\ospath_basename.py
     -- snipped
     ```
+    """
+    )
+with tabs[5]:
+    st.markdown(
+        """
+    ```python
+    >>> import pathlib
+    >>> 
+    ```
+    每个 `Path` 实例都包含用于处理其引用的文件内容的方法。 要立即检索内容，请使用 `read_bytes()` 或 `read_text()`。 要写入文件，请使用 `write_bytes()` 或 `write_text()`。 使用 `open()` 方法打开文件并保留文件句柄，而不是将名称传递给内置 `open()` 函数。
+    ```python
+    >>> f = pathlib.Path("example.txt")
+    >>> f.write_bytes("This is the content".encode("utf-8"))
+    19
+    >>> with f.open("r", encoding="utf-8") as handle:
+    ...     print(f"read from open() : {handle.read()!r}")
+    ...
+    read from open() : 'This is the content'
+    >>> print(f"read text() : {f.read_text(encoding='utf-8')!r}")
+    read text() : 'This is the content'
+    >>>
+    ```
+    这些便捷方法在打开文件并写入文件之前会进行一些类型检查，但除此之外它们相当于直接执行操作。
+    """
+    )
+with tabs[6]:
+    st.markdown(
+        """
+    ```python
+    >>> import pathlib
+    >>>
+    ```
+    表示不存在的目录或符号链接的路径可用于创建关联的文件系统条目。 如果路径已经存在，`mkdir()` 会引发 `FileExistsError`。
+    
+    ```python
+    >>> p = pathlib.Path("example_dir")
+    >>> print(f"Creating {p}")
+    Creating example_dir
+    >>> p.mkdir()
+    >>>
+    ```
+    
+    使用 `symlink_to()` 创建符号链接。 该链接将根据路径的值命名，并将引用作为 `symlink_to()` 参数给出的名称。
+    
+    ```python
+    >>> import pathlib
+    >>>
+    >>> p = pathlib.Path("example_link")
+    >>> p.symlink_to("index.rst")
+    >>> print(p)
+    example_link
+    >>> print(p.resolve().name)
+    index.rst
+    >>>
+    ```
+    如果遇到了，`OSError: [WinError 1314] 客户端没有所需的特权。: 'index.rst' -> 'example_link'`，则需要以管理员的方式运行。
+    """
+    )
+with tabs[7]:
+    st.markdown(
+        """
+    `Path` 实例包含多种用于测试路径引用的文件类型的方法。
     """
     )
