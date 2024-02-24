@@ -289,6 +289,47 @@ with tabs[6]:
 with tabs[7]:
     st.markdown(
         """
+    ```python
+    >>> import pathlib
+    >>>
+    ```
     `Path` 实例包含多种用于测试路径引用的文件类型的方法。
+    ```python
+    import itertools, os, pathlib
+
+    root = pathlib.Path("test_files")
+    # Clean up from previous runs.
+    if root.exists():
+        for f in root.iterdir():
+            f.unlink()
+    else:
+        root.mkdir()
+    # Create test files.
+    (root / "file").write_text("This is a regular file", encoding="utf-8")
+    (root / "symlink").symlink_to("file")
+    os.mkdir(str(root / "fifo"))
+    # Check the file types.
+    to_scan = itertools.chain(
+        root.iterdir(), [pathlib.Path("/dev/disk0"), pathlib.Path("/dev/console")]
+    )
+    hfmt = "{:20s}" + (" {:>5}" * 6)
+    print(hfmt.format("Name", "File", "Dir", "Link", "FIFO", "Block", "Character"))
+
+    print()
+    fmt = "{:20s}" + (" {!r:>5}" * 6)
+    for f in to_scan:
+        print(
+            fmt.format(
+                str(f),
+                f.is_file(),
+                f.is_dir(),
+                f.is_symlink(),
+                f.is_fifo(),
+                f.is_block_device(),
+                f.is_char_device(),
+            )
+        )
+
+    ```
     """
     )
