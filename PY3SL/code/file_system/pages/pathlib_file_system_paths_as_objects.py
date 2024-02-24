@@ -414,3 +414,33 @@ with tabs[9]:
     ```
     """
     )
+with tabs[10]:
+    st.markdown(
+        """
+    ```python
+    >>> import pathlib
+    >>>
+    ```
+    根据类型，有两种方法可用于从文件系统中删除内容。要删除空目录，请使用 `rmdir()`。
+    ```python
+    >>> p = pathlib.Path("example_dir")
+    >>> print(f"Removing {p}")
+    Removing example_dir
+    >>> p.rmdir()
+    >>>
+    ```
+    如果已满足后置条件且目录不存在，则会引发 `FileNotFoundError` 异常。如果尝试删除不为空的目录，也会发生错误。
+    
+    对于文件、符号链接和大多数其他路径类型，请使用 `unlink()`。
+    ```python
+    >>> p = pathlib.Path("touched")
+    >>> p.touch()
+    >>> print("exists before removing:", p.exists())
+    exists before removing: True
+    >>> p.unlink()
+    >>> print("exists after removing:", p.exists())
+    exists after removing: False
+    >>>
+    ```
+    """
+    )
