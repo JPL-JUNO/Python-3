@@ -329,7 +329,56 @@ with tabs[7]:
                 f.is_char_device(),
             )
         )
+    ```
+    """
+    )
+with tabs[8]:
+    st.markdown(
+        """
+    ```python
+    >>> import pathlib
+    >>>
+    ```
+    可以使用 `stat()` 和 `lstat()` 方法访问有关文件的详细信息（用于检查可能是符号链接的状态）。这些方法分别产生与 `os.stat()` 和 `os.lstat()` 相同的结果。
+    
+    ```python
+    import pathlib, sys, time
 
+    if len(sys.argv) == 1:
+        filename = __file__
+    else:
+        filename = sys.argv[1]
+    p = pathlib.Path(filename)
+    stat_info = p.stat()
+    print(f"{filename}")
+    print(f"    Size: {stat_info.st_size}")
+    print(f"    Permissions: {oct(stat_info.st_mode)}")
+    print(f"    Owner: {stat_info.st_uid}")
+    print(f"    Device: {stat_info.st_dev}")
+    print(f"    Created: {time.ctime(stat_info.st_ctime)}")
+    print(f"    Last modified: {time.ctime(stat_info.st_mtime)}")
+    print(f"    Last accessed: {time.ctime(stat_info.st_atime)}")
+    ```
+    为了更简单地访问有关文件所有者的信息，请使用 `owner()` 和 `group()`。
+    ```python
+    p = pathlib.Path(__file__)
+    print(f"{p} is owned by {p.owner()} / {p.group()}")
+    # windows is unsupported
+    ```
+    `touch()` 方法的工作方式类似于 Unix 命令 touch 来创建文件或更新文件现有文件的修改时间和权限。
+    ```python
+    p = pathlib.Path("touched")
+    if p.exists():
+        print("Already exists")
+    else:
+        print("creating new")
+    p.touch()
+    start = p.stat()
+    time.sleep(1)
+    p.touch()
+    end = p.stat()
+    print("Start:", time.ctime(start.st_mtime))
+    print("End  :", time.ctime(end.st_mtime))
     ```
     """
     )
