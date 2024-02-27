@@ -1,0 +1,44 @@
+\chapter{输入验证\label{ch08}}
+\section{PyInputPlus 模块}
+PyInputPlus 包含与 input() 类似的、用于多种数据（如数字、日期、E-mail 地址等）的函数。如果用户输入了无效的内容，例如格式错误的日期或超出预期范围的数字，那么 PyInputPlus 会再次提示他们输入。PyInputPlus 还包含其他有用的功能，例如提示用户的次数限制和时间限制（如果要求用户在时限内做出响应）。
+
+PyInputPlus 具有以下几种用于不同类型输入的函数。
+
+inputStr() 类似于内置的 input() 函数，但具有一般的 PyInputPlus 功能。你还可以将自定义验证函数传递给它。
+
+inputNum() 确保用户输入数字并返回 int 或 float 值，这取决于数字是否包含小数点。
+
+inputChoice() 确保用户输入系统提供的选项之一。
+
+inputMenu() 与 inputChoice() 类似，但提供一个带有数字或字母选项的菜单。
+
+inputDatetime() 确保用户输入日期和时间。
+
+inputYesNo() 确保用户输入“yes”或“no”响应。
+
+inputBool() 类似 inputYesNo()，但接收“True”或“False”响应，并返回一个布尔值。
+
+inputEmail() 确保用户输入有效的 E-mail 地址。
+
+inputFilepath() 确保用户输入有效的文件路径和文件名，并可以选择检查是否存在具有该名称的文件。
+
+inputPassword() 类似于内置的 input()，但是在用户输入时显示 * 字符，因此不会在屏幕上显示口令或其他敏感信息。
+
+正如可以将字符串传递给 input() 以提供提示一样，你也可以将字符串传递给 PyInputPlus 模块的函数的 prompt 关键字参数来显示提示。
+\subsection{关键字参数 min、max、greaterThan 和 lessThan}
+接收 int 和 float 数的 inputNum()、inputInt() 和 inputFloat()函数还具有 min、max、greaterThan 和 lessThan 关键字参数，用于指定有效值范围。些关键字参数是可选的，但只要提供，输入就不能小于 min 参数或大于 max 参数（但输入可以等于它们）。而且，输入必须大于 greaterThan 且小于 lessThan 参数（也就是说，输入不能等于它们）。
+\subsection{关键字参数 blank}
+在默认情况下，除非将 blank 关键字参数设置为True，否则不允许输入空格字符。如果你想使输入可选，请使用blank = True，这样用户不需要输入任何内容。
+\subsection{关键字参数 limit、timeout 和 default}
+在默认情况下，PyInputPlus 模块的函数会一直（或在程序运行时）要求用户提供有效输入。如果你希望某个函数在经过一定次数的尝试或一定的时间后停止要求用户输入，就可以使用 limit 和 timeout 关键字参数。用 limit 关键字参数传递一个整数，以确定 PyInputPlus 的函数在放弃之前尝试接收有效输入多少次。用 timeout 关键字参数传递一个整数，以确定用户在多少秒之内必须提供有效输入，然后 PyInputPlus 模块的函数会放弃。如果用户未能提供有效输入，那么这些关键字参数将分别导致函数引发 RetryLimitException 或 TimeoutException 异常。
+
+当你使用这些关键字参数并传入 default 关键字参数时，该函数将返回默认值，而不是引发异常。
+\subsection{关键字参数 allowRegexes 和 blockRegexes}
+你也可以使用正则表达式指定输入是否被接受。关键字参数 allowRegexes 和 blockRegexes 利用正则表达式字符串列表来确定 PyInputPlus 模块的函数将接受或拒绝哪些内容作为有效输入。
+
+你还可以用 blockRegexes 关键字参数指定 PyInputPlus 模块的函数不接收的正则表达式字符串列表。
+
+如果同时指定 allowRegexes 和 blockRegexes 参数，那么允许列表将优先于阻止列表。
+\subsection{将自定义验证函数传递给 inputCustom()}
+你可以编写函数以执行自定义的验证逻辑，并将函数传递给 inputCustom()。inputCustom() 函数还支持常规的 PyInputPlus 功能，该功能可通过
+blank、limit、timeout、default、allowRegexes 和 blockRegexes 关键字参数实现。
