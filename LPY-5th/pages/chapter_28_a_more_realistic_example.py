@@ -1,6 +1,8 @@
 import streamlit as st
 
 st.title(":violet[一个更加实际的示例]")
+st.subheader("[Stephen CUI](https://github.com/JPL-JUNO)")
+st.subheader("2024-02-26")
 tabs = st.tabs(["使用内省工具", "把对象存储到数据库中"])
 with tabs[0]:
     st.markdown(
