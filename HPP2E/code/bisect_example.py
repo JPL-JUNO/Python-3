@@ -13,7 +13,7 @@ import bisect, random
 def find_closest(haystack, needle):
     # bisect.bisect_left will return the first value in the haystack
     # that is greater than the needle
-    # i 可以立即为如果将该数字加入 haystack，那么它排第几
+    # i 可以理解为如果将该数字加入 haystack，那么它排第几
     i = bisect.bisect_left(haystack, needle)
     if i == len(haystack):
         return i - 1
