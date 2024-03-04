@@ -13,3 +13,9 @@ st.title("Python 高性能编程，HPP2E")
 st.subheader(":rainbow[Stephen CUI]")
 st.subheader("2024-02-29")
 
+st.markdown(
+    """
+    - [x] 列表和元组
+    - [x] 字典和集合
+    """
+)
