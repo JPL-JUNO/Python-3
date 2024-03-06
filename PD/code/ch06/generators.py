@@ -161,3 +161,16 @@ files = get_files(paths)
 lines = get_lines(files)
 comments = get_comments(lines)
 print_matching(comments, "spam")
+
+
+def flatten_stack(items):
+    stack = [iter(items)]
+    while stack:
+        try:
+            item = next(stack[-1])
+            if isinstance(item, list):
+                stack.append(iter(item))
+            else:
+                yield item
+        except StopIteration:
+            stack.pop()
