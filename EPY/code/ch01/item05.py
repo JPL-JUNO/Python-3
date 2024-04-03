@@ -34,11 +34,10 @@ else:
     green = 0
 
 
-def get_first_int(values, key, default:int=0):
-    found = values.get(key, [''])
+def get_first_int(values, key, default: int = 0):
+    found = values.get(key, [""])
     if found[0]:
         return int(found[0])
     else:
-        return default 
+        return default
     #  return int(found[0]) if found[0] else 0
-    
