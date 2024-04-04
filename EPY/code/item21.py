@@ -14,6 +14,7 @@ def sort_priority(values, group):
         if x in group:
             return (0, x)
         return (1, x)
+
     # python 的函数是头等对象（见《流畅的 python》），因此可以赋值给变量
     values.sort(key=helper)
 
@@ -43,6 +44,7 @@ def sort_priority2(numbers, group) -> bool:
             found_mask = True  # Scope: 'helper' -- Bad!
             return (0, x)
         return (1, x)
+
     numbers.sort(key=helper)
     return found_mask
 
@@ -71,6 +73,7 @@ def sort_priority3(numbers, group) -> bool:
             found_mask = True  #
             return (0, x)
         return (1, x)
+
     numbers.sort(key=helper)
     return found_mask
 

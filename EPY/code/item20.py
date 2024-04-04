@@ -9,7 +9,7 @@
 
 def careful_divide(a, b):
     try:
-        return a/b
+        return a / b
     except ZeroDivisionError:
         return None
 
@@ -27,14 +27,16 @@ result = careful_divide(x, y)
 if not result:
     # 这样是可以运行的，但是它是不正确的
     # 它只是返回的结果为 0，但是
-    print("如果使用 not result 来判断会导致一些不必要的问题（应该 0, '', [], None 都会判定为 False）")
+    print(
+        "如果使用 not result 来判断会导致一些不必要的问题（应该 0, '', [], None 都会判定为 False）"
+    )
 
 # 改进的方法
 
 
 def careful_divide(a, b):
     try:
-        return True, a/b
+        return True, a / b
     except ZeroDivisionError:
         return False, None
 
@@ -50,18 +52,18 @@ if not result:
 
 def careful_divide(a, b):
     try:
-        return a/b
+        return a / b
     except ZeroDivisionError as e:
-        raise ValueError('Invalid inputs')
+        raise ValueError("Invalid inputs")
 
 
 x, y = 5, 2
 try:
     result = careful_divide(x, y)
 except ValueError:
-    print('Invalid inputs')
+    print("Invalid inputs")
 else:
-    print('Result is %.1f' % result)
+    print("Result is %.1f" % result)
 
 
 def careful_divide(a: float, b: float) -> float:
@@ -82,12 +84,13 @@ def careful_divide(a: float, b: float) -> float:
     Raises
     ------
     ValueError
-        如果分母为 0，那么将会 raise 
+        如果分母为 0，那么将会 raise
     """
     try:
-        return a/b
+        return a / b
     except ZeroDivisionError as e:
-        raise ValueError('Invalid inputs')
+        raise ValueError("Invalid inputs")
+
 
 # Functions that return None to indicate special meaning are error prone
 # because None and other values (e.g., zero, the empty string)

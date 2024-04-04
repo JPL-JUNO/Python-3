@@ -22,3 +22,11 @@ PY3SL/code/ch14/logging_rotation_file_example.out.2
 PY3SL/code/ch14/logging_rotation_file_example.out.3
 PY3SL/code/ch14/logging_rotation_file_example.out.4
 PY3SL/code/ch14/logging_rotation_file_example.out.5
+rename.py
+*.dat
+*.dir
+*.bak
+ABSP2E/my_cats.py
+capitals_*.txt
+draft.py
+.vscode

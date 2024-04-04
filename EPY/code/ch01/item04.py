@@ -6,7 +6,6 @@
 @Description  : 
 """
 
-
 a = 0b10111011
 b = 0xC5F
 print("Binary is %d, hex is %d" % (a, b))
@@ -23,7 +22,9 @@ except TypeError as e:
 
 pantry = [("avocados", 1.25), ("bananas", 2.5), ("cherries", 15)]
 
-print("缺点 2：在填充模板之前，经常要先对准备填写进去的这个值稍微做一些处理，\n但这样一来，整个表达式可能就会写的很长，让人觉得比较混乱")
+print(
+    "缺点 2：在填充模板之前，经常要先对准备填写进去的这个值稍微做一些处理，\n但这样一来，整个表达式可能就会写的很长，让人觉得比较混乱"
+)
 for i, (item, count) in enumerate(pantry):
     print("#%d: %-10s = %.2f" % (i, item, count))
 
