@@ -7,6 +7,8 @@
 @Description  : 了解如何在闭包里面使用外层作用域中的元素
 """
 
+from typing import Any
+
 
 def sort_priority(values, group):
     def helper(x):
@@ -39,3 +41,36 @@ def sort_priority2(numbers, group):
 found = sort_priority2(numbers, group)
 assert not found
 print(numbers)
+
+
+def sort_priority3(numbers, group):
+    found = False
+
+    def helper(x):
+        nonlocal found  # Added
+        if x in group:
+            found = True
+            return (0, x)
+        return (1, x)
+
+    numbers.sort(key=helper)
+    return found
+
+
+class Sorter:
+    def __init__(self, group) -> None:
+        self.group = group
+        self.found = False
+
+    def __call__(self, x) -> Any:
+        if x in self.group:
+            self.found = True
+            return (0, x)
+        return (1, x)
+
+
+sorter = Sorter(group)
+numbers.sort(key=sorter)
+# 有个问题，找到一次之后，就一直是 True
+# 对不同的 numbers，每次都需要实例 Sorter
+assert sorter.found is True
