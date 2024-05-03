@@ -33,3 +33,5 @@ draft.py
 __pycache__
 .benchmarks
 draft.*
+*.calltree
+*.lprof
