@@ -30,3 +30,6 @@ ABSP2E/my_cats.py
 capitals_*.txt
 draft.py
 .vscode
+__pycache__
+.benchmarks
+draft.*
