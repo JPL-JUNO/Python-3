@@ -21,9 +21,12 @@ class Person:
         return f"[Person: {self.name}, {self.pay}]"
 
 
-class Manager(Person):
-    def give_raise(self, percent, bonus=0.1):
+class Manager(Person):  # Inherit
+    def give_raise(self, percent, bonus=0.1):  # Customize
         Person.give_raise(self, percent + bonus)
+
+    def something_else(self):  # Extend
+        pass
 
 
 if __name__ == "__main__":
@@ -38,3 +41,7 @@ if __name__ == "__main__":
     tom.give_raise(0.1)
     print(tom.last_name())
     print(tom)
+    print("All Three")
+    for obj in (bob, sue, tom):
+        obj.give_raise(0.1)
+        print(obj)
