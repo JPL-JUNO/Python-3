@@ -71,3 +71,80 @@ import sys
 if len(sys.argv) != 2:
     raise SystemExit(f"Usage: {sys.argv[0]} filename")
 filename = sys.argv[1]
+
+
+class NetworkError(Exception):
+    pass
+
+
+# raise NetworkError("Cannot find host")
+
+
+class DeviceError(Exception):
+    def __init__(self, errno, msg):
+        self.args = (errno, msg)
+        self.errno = errno
+        self.errmsg = msg
+
+
+# raise DeviceError(1, "Not responding")
+
+
+class HostnameError(NetworkError):
+    pass
+
+
+class TimeoutError(NetworkError):
+    pass
+
+
+def error1():
+    raise HostnameError("Unknown hots")
+
+
+def error2():
+    raise TimeoutError("Timed out")
+
+
+try:
+    error1()
+except NetworkError as e:
+    if type(e) is HostnameError:
+        pass
+    if type(e) is TimeoutError:
+        pass
+
+
+class ApplicationError(Exception):
+    pass
+
+
+def do_something():
+    x = int("N/A")
+
+
+def spam():
+    try:
+        do_something()
+    except Exception as e:
+        raise ApplicationError("It failed") from e
+
+
+try:
+    spam()
+except ApplicationError as e:
+    print("It failed. Reason:", e.__cause__)
+
+
+def spam():
+    try:
+        do_something()
+    except Exception as e:
+        raise ApplicationError from None
+
+
+def spam():
+    try:
+        do_something()
+    except Exception as e:
+        print("It failed", err)

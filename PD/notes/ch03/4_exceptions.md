@@ -172,3 +172,145 @@ filename = sys.argv[1]
 如果要控制 `SIGINT` 的传递，可以使用 signal 模块。
 
 `StopIteration` 异常是迭代协议的一部分，表示迭代结束迭代。
+
+## 定义新的异常
+
+所有内置异常都是以类的形式定义的。要创建新的异常，创建一个继承自 `Exception` 的新类定义。然后通过 `raise` 来使用新的异常。引发异常时，`raise` 语句提供的可选值将用作异常类构造函数的参数。大多数情况下，这是一个包含某种错误消息的字符串。但是，可以编写用户定义的异常来接受一个或多个异常值，如下例所示：
+
+```python
+>>> class DeviceError(Exception):
+...     def __init__(self, errno, msg):
+...         self.args = (errno, msg)
+...         self.errno = errno
+...         self.errmsg = msg
+...
+>>>
+>>> raise DeviceError(1, "Not responding")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+DeviceError: (1, 'Not responding')
+>>>
+```
+
+当你创建一个重新定义 `__init__()` 的自定义异常类时，重要的是将包含 `__init__()` 参数的元组分配给属性 `self.args`。该属性在打印异常回溯消息时使用。如果未定义它，则当发生异常时，用户将无法看到有关异常的任何有用信息。
+
+异常可以使用继承来组织成层次结构。例如，前面定义的 `NetworkError` 异常可以作为各种更具体的错误的基类。以下是示例：
+
+```python
+>>> class HostnameError(NetworkError):
+...     pass
+...
+>>>
+>>> class TimeoutError(NetworkError):
+...     pass
+...
+>>>
+>>> def error1():
+...     raise HostnameError("Unknown hots")
+...
+>>>
+>>> def error2():
+...     raise TimeoutError("Timed out")
+...
+>>> 
+>>> try:
+...     error1()
+... except NetworkError as e:
+...     if type(e) is HostnameError:
+...         pass
+...     if type(e) is TimeoutError:
+...         pass
+...
+>>>
+```
+
+## 链式异常
+
+有时，为了响应异常，可能希望引发不同的异常。为此，引发链式异常：
+
+```python
+>>> class ApplicationError(Exception):
+...     pass
+...
+>>>
+>>> def do_something():
+...     x = int("N/A")
+...
+>>>
+>>> def spam():
+...     try:
+...         do_something()
+...     except Exception as e:
+...         raise ApplicationError("It failed") from e
+...
+>>>
+```
+
+如果发生未捕获的 `ApplicationError` 错误，将收到一条包含这两个异常的消息：
+
+```python
+>>> spam()
+Traceback (most recent call last):
+  File "<stdin>", line 3, in spam
+  File "<stdin>", line 2, in do_something
+ValueError: invalid literal for int() with base 10: 'N/A'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 5, in spam
+ApplicationError: It failed
+>>>
+```
+
+如果捕获 `ApplicationError`，则结果异常的 `__cause__`属性将包含其他异常。例如：
+
+```python
+>>> try:
+...     spam()
+... except ApplicationError as e:
+...     print("It failed. Reason:", e.__cause__)
+...
+It failed. Reason: invalid literal for int() with base 10: 'N/A'
+>>>
+```
+
+如果想要引发一个新的异常而不包括其他异常链，请从 None 引发错误：
+
+```python
+def spam():
+    try:
+        do_something()
+    except Exception as e:
+        raise ApplicationError from None
+```
+
+`except` 块中出现的编程错误也会导致链式异常，但工作方式略有不同。例如，假设有一些像这样的错误代码：
+
+```python
+>>> def spam():
+...     try:
+...         do_something()
+...     except Exception as e:
+...         print("It failed", err)
+...
+```
+
+得到的异常回溯消息略有不同：
+
+```python
+>>> spam()
+Traceback (most recent call last):
+  File "<stdin>", line 3, in spam
+  File "<stdin>", line 2, in do_something
+ValueError: invalid literal for int() with base 10: 'N/A'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 5, in spam
+NameError: name 'err' is not defined
+>>>
+```
