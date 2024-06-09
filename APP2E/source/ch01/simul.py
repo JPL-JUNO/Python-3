@@ -39,6 +39,15 @@ class ParticleSimulator:
                 p.x += d_x
                 p.y += d_y
 
+    def evolve_fast(self, dt):
+        timestep = 1e-5
+        n_steps = int(dt / timestep)
+        for p in self.particles:
+            t_x_ang = timestep * p.ang_vel
+            for _ in range(n_steps):
+                norm = (p.x**2 + p.y**2) ** 0.5
+                p.x, p.y = p.x - t_x_ang * p.y / norm, p.y + t_x_ang * p.x / norm
+
 
 from matplotlib import pyplot as plt
 from matplotlib import animation
@@ -116,6 +125,16 @@ def benchmark():
 
     simulator = ParticleSimulator(particles)
     simulator.evolve(0.1)
+
+
+def benchmark_memory():
+    particles = [
+        Particle(uniform(-1.0, 1.0), uniform(-1.0, 1.0), uniform(-1.0, 1.0))
+        for _ in range(100_000)
+    ]
+
+    simulator = ParticleSimulator(particles)
+    simulator.evolve(1e-3)
 
 
 if __name__ == "__main__":
