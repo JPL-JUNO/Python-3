@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/cygdrive/d/Python3.11.1/python
 
 import os
 from subprocess import getstatusoutput, getoutput
@@ -16,9 +16,9 @@ def test_runnable():
 
 
 def test_executable():
-
-    out = getoutput(prg)
-    assert out.strip() == ""
+    """这个有点难测试"""
+    out = getoutput(f"bash -c {prg}")
+    assert out.strip() == "Hello, World!"
 
 
 def test_usage():
@@ -30,4 +30,9 @@ def test_usage():
         assert out.lower().startswith("usage")
 
 
-getstatusoutput("hello.py --help")
+def test_input():
+    for val in ["Universe", "Multiverse"]:
+        for option in ["-n", "--name"]:
+            rv, out = getstatusoutput(f"python {prg} {option} {val}")
+            assert rv == 0
+            assert out.strip() == f"Hello, {val}!"
