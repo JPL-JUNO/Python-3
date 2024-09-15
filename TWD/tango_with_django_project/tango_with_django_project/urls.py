@@ -18,6 +18,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls import include
+from django.conf import settings
+from django.conf.urls.static import static
 
 # path 使用的简单的，非正则的模式
 
@@ -29,4 +31,4 @@ urlpatterns = [
     # 上面的映射把以 rango/ 开头的 URL 交给 rango 应用处理
     # re_path(r"^$", views.index, name="index"),
     path("admin/", admin.site.urls),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

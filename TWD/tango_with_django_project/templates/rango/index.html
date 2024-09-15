@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% load static %}
+<!-- 告诉 Django 模板引擎，我们将在模板中使用静态文 -->
+<!-- 件。 -->
+<html>
+
+<head>
+    <title>Rango</title>
+</head>
+
+<body>
+    <h1>Rango says...</h1>
+    <div>
+        hey there partner!<br />
+        <!-- {{ boldmessage }} 形式。这是 Django 模板变量。我们可以为这样的 -->
+        <!-- 变量设值，这样渲染模板后便会显示我们设定的值。 -->
+        <strong>{{boldmessage}}</strong><br />
+    </div>
+
+    <div>
+        <a href="/rango/about/">About</a><br />
+        <img src="{% static 'images/rango.png' %}" alt="Picture of Rango">
+    </div>
+</body>
+
+</html>
