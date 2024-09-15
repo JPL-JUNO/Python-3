@@ -4,7 +4,10 @@ from rango import views
 # 这里是处理所有除去 rango/ 的 url
 
 
-urlpatterns = [path("", views.index, name="index")]
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("about/", views.about, name="about"),
+]
 
 # URL 映射调用 Django 的 url() 函数，其第一个参数是正则表达式 ^$。这个正则表
 # 达式匹配空字符串，因为 ^ 表示开头，$ 表示结尾，而且二者之间没有任何内容，所以只能匹配
