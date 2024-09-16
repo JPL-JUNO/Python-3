@@ -85,7 +85,11 @@ WSGI_APPLICATION = "tango_with_django_project.wsgi.application"
 
 DATABASES = {
     "default": {
+        # default 数据库由一个轻量级数据库引
+        # 擎驱动，即 SQLite（见 ENGINE 键）
         "ENGINE": "django.db.backends.sqlite3",
+        # NAME 键的值是数据库文件的路径，默认为 Django 项目根目
+        # 录中的 db.sqlite3
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
