@@ -7,6 +7,13 @@ from rango import views
 urlpatterns = [
     path("", views.index, name="index"),
     path("about/", views.about, name="about"),
+    path(
+        # URL 模式中有个参数，即 <category_name_slug>，在视图中可以访
+        # 问。声明带参数的 URL 时，要确保对应的视图中有那个参数。
+        "category/<slug:category_name_slug>/",
+        views.show_category,
+        name="show_category",
+    ),
 ]
 
 # URL 映射调用 Django 的 url() 函数，其第一个参数是正则表达式 ^$。这个正则表
