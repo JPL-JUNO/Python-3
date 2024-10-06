@@ -71,3 +71,24 @@ def show_category(request, category_name_slug):
         context_dict["category"] = None
         context_dict["pages"] = None
     return render(request, "rango/category.html", context_dict)
+
+
+from rango.forms import CategoryForm
+
+
+def add_category(request):
+    form = CategoryForm()
+
+    if request.method == "POST":
+        form = CategoryForm(request.POST)
+
+        if form.is_valid():
+            form.save(commit=True)  # 把新分类存入数据库
+
+            # 保存新分类后可以显示一个确认消息
+            # 不过既然最受欢迎的分类在首页
+            # 那就把用户带到首页吧
+            return index(request)
+        else:
+            print(form.errors)
+    return render(request, "rango/add_category.html", {"form": form})
